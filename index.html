@@ -45,27 +45,29 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 15px;
+            padding: 0 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             box-sizing: border-box;
             transition: background-color 0.3s, color 0.3s;
             -webkit-tap-highlight-color: transparent;
+            overflow: hidden; /* Ngăn toàn bộ trang bị cuộn nảy trên iOS */
         }
 
+        /* Tối ưu khoảng cách phía trên gần Dynamic Island */
         .header-row {
             position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 400px;
-            margin-bottom: 20px;
-            margin-top: calc(env(safe-area-inset-top) + 5px);
+            max-width: 430px;
+            margin-bottom: 12px;
+            margin-top: calc(env(safe-area-inset-top) + 4px); /* Thu hẹp khoảng trống đỉnh */
         }
-        h1.title { font-size: 24px; margin: 0; color: var(--primary); font-weight: bold; text-align: center; }
+        h1.title { font-size: 22px; margin: 0; color: var(--primary); font-weight: bold; text-align: center; }
         
         .theme-toggle-btn {
             position: absolute;
@@ -79,7 +81,17 @@
             user-select: none;
         }
 
-        .container { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
+        /* Biến Container thành Flexbox kéo dài hết màn hình */
+        .container { 
+            width: 100%; 
+            max-width: 430px; 
+            flex: 1;
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-bottom: calc(env(safe-area-inset-bottom) + 10px); /* Khoảng cách an toàn nút đáy iPhone */
+            overflow: hidden;
+        }
 
         .controls-row { 
             display: flex; 
@@ -87,8 +99,8 @@
             justify-content: space-between; 
             gap: 10px; 
             background-color: var(--card-bg);
-            padding: 8px 12px;
-            border-radius: 12px;
+            padding: 10px 14px;
+            border-radius: 14px;
             border: 1px solid var(--border-color);
         }
         .select-wrapper { display: flex; align-items: center; gap: 6px; flex: 1; }
@@ -112,10 +124,20 @@
         .bookmark-filter { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--text-muted); margin: -2px 0; cursor: pointer; font-weight: 500; }
 
         .mode-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .mode-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 10px 2px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 600; text-align: center; }
+        .mode-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 12px 2px; border-radius: 12px; font-size: 13px; cursor: pointer; font-weight: 600; text-align: center; }
         .mode-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
 
-        .flashcard { width: 100%; height: 350px; perspective: 1000px; margin: 2px 0; cursor: pointer; }
+        /* TAB CONTENT ĐỘNG */
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* KIỂU DÁNG THẺ FLASHCARD */
+        .flashcard { width: 100%; height: 360px; perspective: 1000px; margin: 4px 0; cursor: pointer; }
         .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.4s; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; }
         .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
         
@@ -141,21 +163,31 @@
         .blur-box { filter: blur(6px); background: var(--blur-bg); border-radius: 4px; padding: 2px 8px; cursor: pointer; color: transparent; display: inline-block; transition: filter 0.2s; }
         .blur-box.revealed { filter: none; background: transparent; color: inherit; }
 
-        .nav-buttons { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
-        .nav-btn { flex: 1; background-color: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .nav-buttons { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; margin-top: 4px; }
+        .nav-btn { flex: 1; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .nav-btn.btn-secondary { background-color: var(--secondary); color: var(--text-color); max-width: 90px; }
-        .counter { font-size: 14px; color: var(--primary); font-weight: bold; text-align: center; margin: 2px 0; }
+        .counter { font-size: 14px; color: var(--primary); font-weight: bold; text-align: center; margin: 4px 0; }
 
-        footer { display: flex; justify-content: center; gap: 15px; font-size: 13px; margin-top: 4px; }
+        footer { display: flex; justify-content: center; gap: 15px; font-size: 13px; margin-top: 6px; margin-bottom: 4px; }
         footer a { color: var(--primary); text-decoration: none; font-weight: bold; }
 
         .score-board { display: flex; justify-content: flex-start; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: var(--primary); }
         .quiz-question { font-size: 52px; font-weight: bold; text-align: center; margin-top: 15px; margin-bottom: 10px; color: var(--primary); font-family: "Hiragino Mincho ProN", serif; }
         .game-input { width: 100%; padding: 14px; font-size: 15px; background-color: var(--card-bg); border: 2px solid var(--primary); border-radius: 14px; outline: none; color: var(--text-color); box-sizing: border-box; margin-bottom: 12px; text-align: center; font-weight: 500; }
 
-        .vocab-table-wrapper { max-height: 360px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 12px; background: var(--card-bg); -webkit-overflow-scrolling: touch; }
+        /* 🟢 KHẮC PHỤC LỖI KÉO DÀI BẢNG DANH SÁCH XUỐNG ĐÁY IPHONE 15 PLUS */
+        .vocab-table-wrapper { 
+            flex: 1; /* Tự động kéo dài chiếm hết khoảng trống màu vàng phía dưới */
+            overflow-y: auto; 
+            overflow-x: auto; 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            background: var(--card-bg); 
+            -webkit-overflow-scrolling: touch; 
+            margin-bottom: 5px;
+        }
         .vocab-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; white-space: nowrap; }
-        .vocab-table th, .vocab-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .vocab-table th, .vocab-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         .vocab-table th { background: var(--primary); color: white; position: sticky; top: 0; z-index: 100; font-weight: 600; }
 
         .modal-overlay { 
@@ -181,11 +213,6 @@
         .modal-divider { border: none; border-top: 1px dashed var(--border-color); margin: 16px 0; }
         .modal-example-jp { font-size: 15px; color: var(--text-color); line-height: 1.4; margin-bottom: 6px; }
         .modal-example-vi { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
-
-        @media only screen and (max-width: 430px) {
-            body { padding: calc(10px + env(safe-area-inset-top)) 15px calc(15px + env(safe-area-inset-bottom)) 15px!important; }
-            .flashcard { height: 340px !important; }
-        }
     </style>
 </head>
 <body>
@@ -216,7 +243,7 @@
     </div>
 
     <!-- TAB FLASHCARD -->
-    <div id="tab-flashcard" class="tab-content" style="display: block;">
+    <div id="tab-flashcard" class="tab-content" style="display: flex;">
         <div class="flashcard" id="flashcard-container" onclick="flipCard()">
             <div class="flashcard-inner">
                 <div class="flashcard-front">
@@ -278,7 +305,7 @@
 
     <!-- TAB DANH SÁCH -->
     <div id="tab-manager" class="tab-content" style="display: none;">
-        <h3 id="manager-title" style="margin:5px 0; font-size:14px; color:var(--primary);">Danh sách</h3>
+        <h3 id="manager-title" style="margin:2px 0 6px 0; font-size:14px; color:var(--primary);">Danh sách</h3>
         <div class="vocab-table-wrapper">
             <table class="vocab-table">
                 <thead>
@@ -324,7 +351,6 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
     })();
 
-    // 🟢 HÀM KÍCH HOẠT VÀ ĐÁNH THỨC ÂM THANH TRÊN IPHONE (BẮT BUỘC)
     function unlockAudio() {
         try {
             window.speechSynthesis.cancel();
@@ -354,7 +380,6 @@
     window.onload = () => { 
         updateThemeToggleIcon();
         initSheetSelect(); 
-        // Gọi nạp danh sách giọng nói sớm để tránh trễ giọng đọc của iOS
         if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = () => {};
         }
@@ -470,7 +495,7 @@
         document.getElementById('only-bookmarked').checked = false;
         currentList = (db[currentSheetName] || []).map(w => { w.hanviet = autoTranslateHanViet(w.kanji); return w; });
         activeWordIndex = 0; updateFlashcard(); initTyping();
-        if(document.getElementById('tab-manager').style.display === 'block') { renderManagerList(); }
+        if(document.getElementById('tab-manager').style.display === 'flex') { renderManagerList(); }
     }
 
     function saveToLocalStorage() { localStorage.setItem('jlpt_kanji_db', JSON.stringify(db)); }
@@ -478,7 +503,9 @@
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.mode-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).style.display = 'block';
+        
+        // Đổi trạng thái hiển thị sang flex để kích hoạt chiều cao co giãn động
+        document.getElementById(tabId).style.display = 'flex';
         if(btn) btn.classList.add('active');
         if(tabId === 'tab-manager') renderManagerList();
         if(tabId === 'tab-typing') initTyping();
@@ -543,37 +570,21 @@
         activeWordIndex = 0; updateFlashcard();
     }
 
-    // 🟢 HÀM PHÁT ÂM THANH ƯU TIÊN GIỌNG SIRI TRÊN IPHONE
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
         if(!text) return;
-
-        // Giải phóng và xóa bộ nhớ đệm âm thanh cũ của iOS trước khi phát
         window.speechSynthesis.cancel(); 
-
         const u = new SpeechSynthesisUtterance(text); 
-        u.lang = 'ja-JP'; 
-        u.rate = 0.88; // Tốc độ chuẩn đọc tiếng Nhật học tập
-
-        // Tìm kiếm các nguồn giọng nói chất lượng cao hoặc Siri cài trên iPhone
+        u.lang = 'ja-JP'; u.rate = 0.88;
         if (typeof speechSynthesis !== 'undefined') {
             const voices = speechSynthesis.getVoices();
-            // Lọc giọng nói tiếng Nhật
             const jaVoices = voices.filter(v => v.lang.startsWith('ja'));
-            
-            // Tìm kiếm giọng đọc cao cấp của hệ thống Apple (Otoya Premium hoặc Siri)
             const siriVoice = jaVoices.find(v => v.name.includes('Otoya') || v.name.includes('Siri') || v.name.includes('Premium'));
-            
-            if (siriVoice) {
-                u.voice = siriVoice;
-            } else if (jaVoices.length > 0) {
-                u.voice = jaVoices[0]; // Phương án dự phòng giọng tiếng Nhật mặc định
-            }
+            if (siriVoice) u.voice = siriVoice;
+            else if (jaVoices.length > 0) u.voice = jaVoices[0];
         }
-
         window.speechSynthesis.speak(u); 
     }
-    
     function speakCurrentWord(e) { const w = currentList[activeWordIndex]; speakJapaneseText(e, w.kana || w.kanji); }
     function speakCurrentExample(e) { speakJapaneseText(e, currentList[activeWordIndex].exampleJp); }
     function revealBlur(e, el) { e.stopPropagation(); el.classList.toggle('revealed'); }
