@@ -476,7 +476,7 @@
 
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
         "N1_Mondai_Demo": [
-            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm (chế tạo) rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
+            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚 là頑丈に作られている。", exampleVi: "Cái kệ này được làm (chế tạo) rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
             { kanji: "圧倒적", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強さで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
             { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false }
         ]
@@ -677,7 +677,7 @@
         document.getElementById('fc-gemini').href = `https://gemini.google.com/?q=Phân tích từ vựng N1: "${word.kanji}"`;
     }
 
-    // SỬA LIÊN KẾT: KẾT HỢP CLIPBOARD VÀ UNIVERSAL HTTPS LINK ĐỂ TỰ ĐỘNG TRA TRÊN IOS/ANDROID
+    // CHỈNH SỬA: ĐIỀU HƯỚNG THÔNG MINH TÁCH BIỆT LAPTOP (MỞ TAB MỚI) VÀ ĐIỆN THOẠI (MỞ APP NATIVE)
     async function openMaziiApp(e) {
         if(e) e.stopPropagation();
         if(currentList.length === 0) return;
@@ -693,10 +693,26 @@
         }
 
         const keyword = encodeURIComponent(text);
-        window.location.href = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
+        const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
+        const appUrl = `mazii://search/${keyword}`;
+        
+        // Kiểm tra xem thiết bị hiện tại có phải là Mobile/Tablet hay không
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            const startTime = Date.now();
+            window.location.href = appUrl;
+            
+            setTimeout(() => {
+                if (Date.now() - startTime < 800) {
+                    window.location.href = webUrl;
+                }
+            }, 500);
+        } else {
+            // Nếu là Laptop/PC, mở thẳng trang web ở Tab mới luôn
+            window.open(webUrl, '_blank');
+        }
     }
 
-    // ĐÃ THÊM LẠI: ĐIỀU HƯỚNG TỪ POPUP SỬ DỤNG PHƯƠNG THỨC TRA ĐỒNG BỘ MỚI
+    // CHỈNH SỬA: ĐIỀU HƯỚNG THÔNG MINH CHO POPUP GIỮA LAPTOP (MỞ TAB MỚI) VÀ ĐIỆN THOẠI (MỞ APP NATIVE)
     async function openMaziiFromPopup() {
         const kanjiText = document.getElementById('modal-kanji-text').innerText;
         if(!kanjiText || kanjiText === '-') return;
@@ -710,7 +726,23 @@
         }
 
         const keyword = encodeURIComponent(kanjiText);
-        window.location.href = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
+        const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
+        const appUrl = `mazii://search/${keyword}`;
+        
+        // Kiểm tra xem thiết bị hiện tại có phải là Mobile/Tablet hay không
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            const startTime = Date.now();
+            window.location.href = appUrl;
+            
+            setTimeout(() => {
+                if (Date.now() - startTime < 800) {
+                    window.location.href = webUrl;
+                }
+            }, 500);
+        } else {
+            // Nếu là Laptop/PC, mở thẳng trang web ở Tab mới luôn
+            window.open(webUrl, '_blank');
+        }
     }
 
     function handleDifficulty(level, event) {
@@ -742,7 +774,6 @@
         });
     }
     
-    // Đã sửa: Đồng bộ bộ lọc tức thì sang cả Tab Danh Sách khi click checkbox
     function toggleStarredFilter() {
         const full = db[currentSheetName] || [];
         currentList = document.getElementById('only-bookmarked').checked ? full.filter(w => w.starred) : [...full];
@@ -756,20 +787,19 @@
         filterManagerList(); 
     }
 
-    // Đã sửa: Tối ưu hóa phát âm thanh chuẩn Siri tự nhiên và chống lỗi trên iPhone (iOS)
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
         if(!text) return;
 
         try {
-            window.speechSynthesis.cancel(); // Ngắt âm thanh đang phát trước đó
+            window.speechSynthesis.cancel(); 
         } catch(err) { console.log(err); }
         
-        const cleanText = text.replace(/<[^>]*>/g, ''); // Loại bỏ thẻ html
+        const cleanText = text.replace(/<[^>]*>/g, ''); 
         
         currentUtterance = new SpeechSynthesisUtterance(cleanText); 
         currentUtterance.lang = 'ja-JP'; 
-        currentUtterance.rate = 0.95; // Tốc độ Siri đọc chuẩn tự nhiên nhất
+        currentUtterance.rate = 0.95; 
         
         if (window.speechSynthesis.getVoices) {
             const voices = window.speechSynthesis.getVoices();
@@ -875,7 +905,6 @@
         filterManagerList(); 
     }
 
-    // Đã sửa: Sửa triệt để lỗi không lọc danh sách khi checkbox được check
     function filterManagerList() {
         const keyword = document.getElementById('vocab-search-input').value.trim().toLowerCase();
         const tbody = document.getElementById('vocab-list-tbody'); 
