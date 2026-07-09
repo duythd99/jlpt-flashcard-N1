@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Flashcard JLPT N1 🌸</title>
     
-    <!-- Cấu hình hiển thị mượt mà trên Mobile App -->
-    <link rel="manifest" href="manifest.json">
+    <link class="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,30 +13,43 @@
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
+        /* BẢNG MÀU CHUẨN PASTEL */
         :root[data-theme="light"] {
             --bg-color: #F8FAF8;
             --card-bg: #FFFFFF;
-            --text-color: #2D3436;
-            --text-muted: #6C757D;
-            --primary: #7CB59B;
-            --primary-hover: #6CA389;
+            --primary: #7FB69B;
             --secondary: #A8DADC;
             --accent: #F4A261;
+            --success: #74C69D;
+            --warning: #E9C46A;
+            --error: #E76F51;
+            --text-color: #2D3436;
+            --text-muted: #6C757D;
             --border-color: #E2E8F0;
             --blur-bg: #E2E8F0;
+            --option-bg: #FFFFFF;
+            --option-text: #2D3436;
+            --highlight-bg: rgba(244, 162, 97, 0.25);
+            --highlight-text: #E76F51;
         }
 
         :root[data-theme="dark"] {
             --bg-color: #1F2937;
-            --card-bg: #2D3748;
-            --text-color: #F8F9FA;
-            --text-muted: #CBD5E1;
+            --card-bg: #203748;
             --primary: #9FD3C7;
-            --primary-hover: #8BC2B6;
             --secondary: #8ECAE6;
             --accent: #F6BD60;
-            --border-color: #4A5568;
+            --success: #95D5B2;
+            --warning: #FFD166;
+            --error: #FF6B6B;
+            --text-color: #F8F9FA;
+            --text-muted: #CBD5E1;
+            --border-color: #2D3748;
             --blur-bg: #4A5568;
+            --option-bg: #203748;
+            --option-text: #F8F9FA;
+            --highlight-bg: rgba(246, 189, 96, 0.25);
+            --highlight-text: #F6BD60;
         }
 
         body {
@@ -53,10 +65,9 @@
             box-sizing: border-box;
             transition: background-color 0.3s, color 0.3s;
             -webkit-tap-highlight-color: transparent;
-            overflow: hidden; /* Ngăn toàn bộ trang bị cuộn nảy trên iOS */
+            overflow: hidden;
         }
 
-        /* Tối ưu khoảng cách phía trên gần Dynamic Island */
         .header-row {
             position: relative;
             display: flex;
@@ -65,7 +76,7 @@
             width: 100%;
             max-width: 430px;
             margin-bottom: 12px;
-            margin-top: calc(env(safe-area-inset-top) + 4px); /* Thu hẹp khoảng trống đỉnh */
+            margin-top: calc(env(safe-area-inset-top) + 4px);
         }
         h1.title { font-size: 22px; margin: 0; color: var(--primary); font-weight: bold; text-align: center; }
         
@@ -81,7 +92,6 @@
             user-select: none;
         }
 
-        /* Biến Container thành Flexbox kéo dài hết màn hình */
         .container { 
             width: 100%; 
             max-width: 430px; 
@@ -89,7 +99,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 12px; 
-            margin-bottom: calc(env(safe-area-inset-bottom) + 10px); /* Khoảng cách an toàn nút đáy iPhone */
+            margin-bottom: calc(env(safe-area-inset-bottom) + 10px);
             overflow: hidden;
         }
 
@@ -107,6 +117,11 @@
         .select-wrapper label { font-size: 13px; font-weight: bold; color: var(--text-muted); white-space: nowrap; }
         select { width: 100%; background-color: transparent; color: var(--text-color); border: none; padding: 4px 0; font-size: 14px; outline: none; font-weight: 600; cursor: pointer; }
         
+        select option {
+            background-color: var(--option-bg);
+            color: var(--option-text);
+        }
+
         .file-input-label {
             display: inline-flex;
             align-items: center;
@@ -127,7 +142,6 @@
         .mode-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 12px 2px; border-radius: 12px; font-size: 13px; cursor: pointer; font-weight: 600; text-align: center; }
         .mode-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
 
-        /* TAB CONTENT ĐỘNG */
         .tab-content {
             display: none;
             flex-direction: column;
@@ -136,8 +150,8 @@
             overflow: hidden;
         }
 
-        /* KIỂU DÁNG THẺ FLASHCARD */
-        .flashcard { width: 100%; height: 360px; perspective: 1000px; margin: 4px 0; cursor: pointer; }
+        /* CARD STYLE */
+        .flashcard { width: 100%; height: 320px; perspective: 1000px; margin: 4px 0; cursor: pointer; }
         .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.4s; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; }
         .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
         
@@ -160,24 +174,62 @@
         .fb-kana { font-size: 18px; color: var(--text-muted); font-weight: 500; margin: 0; display: flex; align-items: center; justify-content: center; }
         .fb-mean { font-size: 21px; font-weight: bold; margin: 4px 0; color: var(--text-color); }
 
-        .blur-box { filter: blur(6px); background: var(--blur-bg); border-radius: 4px; padding: 2px 8px; cursor: pointer; color: transparent; display: inline-block; transition: filter 0.2s; }
-        .blur-box.revealed { filter: none; background: transparent; color: inherit; }
+        .blur-box { filter: blur(6px); background: var(--blur-bg); border-radius: 6px; padding: 2px 10px; cursor: pointer; color: transparent; display: inline-block; transition: filter 0.25s; user-select: none; }
+        .blur-box.revealed { filter: none; background: transparent; color: inherit; user-select: text; }
+
+        /* CSS STYLE HIGHLIGHT CHO TỪ VỰNG TRONG CÂU */
+        mark.highlight-word {
+            background-color: var(--highlight-bg);
+            color: var(--highlight-text);
+            font-weight: bold;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
 
         .nav-buttons { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; margin-top: 4px; }
         .nav-btn { flex: 1; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .nav-btn.btn-secondary { background-color: var(--secondary); color: var(--text-color); max-width: 90px; }
-        .counter { font-size: 14px; color: var(--primary); font-weight: bold; text-align: center; margin: 4px 0; }
+        
+        .progress-container { width: 100%; display: flex; flex-direction: column; gap: 4px; margin: 2px 0; }
+        .progress-bar-bg { width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background-color: var(--success); transition: width 0.3s ease; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); }
 
-        footer { display: flex; justify-content: center; gap: 15px; font-size: 13px; margin-top: 6px; margin-bottom: 4px; }
-        footer a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        .difficulty-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin: 8px 0; }
+        .diff-btn { border: none; padding: 12px 4px; border-radius: 12px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 0.1s; }
+        .diff-btn:active { transform: scale(0.96); }
+        .diff-again { background-color: var(--error); }
+        .diff-hard { background-color: var(--accent); }
+        .diff-good { background-color: var(--primary); }
+        .diff-easy { background-color: var(--secondary); color: #2D3436; }
+        .diff-btn span { font-size: 11px; font-weight: normal; opacity: 0.9; }
 
-        .score-board { display: flex; justify-content: flex-start; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: var(--primary); }
-        .quiz-question { font-size: 52px; font-weight: bold; text-align: center; margin-top: 15px; margin-bottom: 10px; color: var(--primary); font-family: "Hiragino Mincho ProN", serif; }
-        .game-input { width: 100%; padding: 14px; font-size: 15px; background-color: var(--card-bg); border: 2px solid var(--primary); border-radius: 14px; outline: none; color: var(--text-color); box-sizing: border-box; margin-bottom: 12px; text-align: center; font-weight: 500; }
+        footer { display: flex; justify-content: center; gap: 15px; font-size: 13px; margin-top: auto; margin-bottom: 4px; padding-top: 8px; }
+        footer a { color: var(--primary); text-decoration: none; font-weight: bold; cursor: pointer; }
 
-        /* 🟢 KHẮC PHỤC LỖI KÉO DÀI BẢNG DANH SÁCH XUỐNG ĐÁY IPHONE 15 PLUS */
+        /* GIAO DIỆN MỤC GÕ TỪ */
+        .quiz-stats-board { display: flex; justify-content: space-around; background-color: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .stat-label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
+        .stat-val.correct { color: var(--success); font-size: 15px; }
+        .stat-val.wrong { color: var(--error); font-size: 15px; }
+        .stat-val.total { color: var(--text-color); font-size: 15px; }
+
+        .quiz-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .quiz-question { font-size: 56px; font-weight: bold; text-align: center; color: var(--primary); margin: 0; font-family: "Hiragino Mincho ProN", serif; }
+        .quiz-hint-wrapper { text-align: center; font-size: 14px; color: var(--text-muted); }
+        .quiz-hint-text { font-weight: 600; color: var(--accent); font-size: 16px; margin-top: 4px; display: block; }
+
+        .game-input { width: 100%; padding: 16px; font-size: 16px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 14px; outline: none; color: var(--text-color); box-sizing: border-box; text-align: center; font-weight: 600; transition: border-color 0.2s; }
+        .game-input:focus { border-color: var(--primary); }
+        .type-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+
+        .search-box-wrapper { width: 100%; margin-bottom: 8px; box-sizing: border-box; }
+        .search-input { width: 100%; padding: 10px 14px; font-size: 14px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--primary); }
+
         .vocab-table-wrapper { 
-            flex: 1; /* Tự động kéo dài chiếm hết khoảng trống màu vàng phía dưới */
+            flex: 1; 
             overflow-y: auto; 
             overflow-x: auto; 
             border: 1px solid var(--border-color); 
@@ -204,15 +256,15 @@
             backdrop-filter: blur(4px); 
             -webkit-backdrop-filter: blur(4px);
         }
-        .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 35px 24px 28px 24px; text-align: center; position: relative; width: 88%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 2001; }
+        .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 35px 24px 28px 24px; text-align: center; position: relative; width: 88%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 2011; }
         .modal-close { position: absolute; top: 10px; right: 16px; font-size: 22px; cursor: pointer; color: var(--text-muted); }
         .modal-kanji { font-size: 56px; font-weight: bold; color: var(--primary); font-family: "Hiragino Mincho ProN", serif; }
-        .modal-hanviet { margin-top: 8px; font-size: 16px; font-weight: bold; color: var(--accent); text-transform: uppercase; }
+        .modal-hanviet { margin-top: 8px; font-size: 16px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; }
         .modal-kana { margin-top: 4px; font-size: 15px; color: var(--text-color); }
         .modal-meaning { margin-top: 8px; font-size: 18px; font-weight: 600; }
         .modal-divider { border: none; border-top: 1px dashed var(--border-color); margin: 16px 0; }
         .modal-example-jp { font-size: 15px; color: var(--text-color); line-height: 1.4; margin-bottom: 6px; }
-        .modal-example-vi { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+        .modal-example-vi { font-size: 13px; color: var(--text-muted); line-height: 1.4; display: inline-block; }
     </style>
 </head>
 <body>
@@ -270,41 +322,86 @@
                         Từ đồng nghĩa: <span class="blur-box" id="fc-same" onclick="revealBlur(event, this)"></span>
                     </div>
                     
-                    <div style="font-size:14px; border-top:1px dashed var(--border-color); padding-top:12px; width:100%; display: flex; flex-direction: column; align-items: center; gap: 4px;" id="fc-ex-box">
-                        <div style="font-weight:bold;">Ví dụ: <button class="audio-btn" onclick="speakCurrentExample(event)">🔊</button></div>
-                        <span id="fc-ex-jp" style="font-style:italic; font-size:15px; color: var(--text-color);"></span>
-                        <span style="color:var(--text-muted);">Dịch: <span class="blur-box" id="fc-ex-vi" onclick="revealBlur(event, this)"></span></span>
+                    <div style="font-size:14px; border-top:1px dashed var(--border-color); padding-top:12px; width:100%; display: flex; flex-direction: column; align-items: center; gap: 8px;" id="fc-ex-box">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <span id="fc-ex-jp" style="font-style:italic; font-size:15px; color: var(--text-color); text-align: center;"></span>
+                            <button class="audio-btn" onclick="speakCurrentExample(event)">🔊</button>
+                        </div>
+                        <span class="blur-box" id="fc-ex-vi" onclick="revealBlur(event, this)"></span>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="nav-buttons">
             <button class="nav-btn" onclick="prevCard()">&larr; Trước</button>
             <button class="nav-btn btn-secondary" onclick="shuffleCards()">🔀 Trộn</button>
             <button class="nav-btn" onclick="nextCard()">Tiếp &rarr;</button>
         </div>
-        <div class="counter" id="card-counter">0 / 0</div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+            <div class="progress-info">
+                <span id="progress-text">Tiến độ: 0%</span>
+                <span id="card-counter">0 / 0</span>
+            </div>
+        </div>
+
+        <div class="difficulty-panel">
+            <button class="diff-btn diff-again" onclick="handleDifficulty('again', event)">Học lại<span>Again</span></button>
+            <button class="diff-btn diff-hard" onclick="handleDifficulty('hard', event)">Khó<span>Hard</span></button>
+            <button class="diff-btn diff-good" onclick="handleDifficulty('good', event)">Tốt<span>Good</span></button>
+            <button class="diff-btn diff-easy" onclick="handleDifficulty('easy', event)">Dễ<span>Easy</span></button>
+        </div>
+
         <footer>
             <a id="fc-gemini" href="#" target="_blank">🔍 Tra Gemini</a>
             <span style="color:var(--border-color)">|</span>
-            <a id="fc-mazii" href="#" target="_blank">📖 Từ điển Mazii</a>
+            <a onclick="openMaziiApp(event)">📖 Từ điển Mazii</a>
         </footer>
     </div>
 
     <!-- TAB GÕ TỪ -->
     <div id="tab-typing" class="tab-content" style="display: none;">
-        <div class="score-board"><span>Điểm: <span id="type-score">0</span></span></div>
-        <div class="quiz-question" id="type-q">-</div>
-        <div style="text-align: center; font-size: 14px; font-weight: 500; color: var(--accent); margin-bottom: 20px;">
-            Gợi ý ý nghĩa: <span id="type-hint" style="font-weight: 600;">-</span>
+        <div class="quiz-stats-board">
+            <div class="stat-item">
+                <span class="stat-label">Đúng</span>
+                <span id="type-correct-count" class="stat-val correct">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Sai / Qua</span>
+                <span id="type-wrong-count" class="stat-val wrong">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tổng đã gõ</span>
+                <span id="type-total-count" class="stat-val total">0</span>
+            </div>
         </div>
-        <input type="text" id="type-input" class="game-input" placeholder="Nhập cách đọc Hiragana/Kana..." onkeypress="checkTyping(event)">
-        <button id="type-skip-btn" class="mode-btn" style="width: 100%; margin-top: 4px;" onclick="skipTyping()">Bỏ qua / Câu khác</button>
-        <p id="type-feedback" style="text-align:center; font-weight:bold; font-size:14px; height:20px; margin: 6px 0;"></p>
+
+        <div class="quiz-card">
+            <div class="quiz-question" id="type-q">-</div>
+            <div class="quiz-hint-wrapper">
+                Gợi ý ý nghĩa:
+                <span id="type-hint" class="quiz-hint-text">-</span>
+            </div>
+            
+            <input type="text" id="type-input" class="game-input" placeholder="Nhập cách đọc Hiragana/Kana..." onkeypress="checkTyping(event)">
+            
+            <div class="type-actions">
+                <button id="type-skip-btn" class="mode-btn" style="width: 100%; padding: 14px; border-radius: 14px;" onclick="skipTyping()">Bỏ qua / Câu khác</button>
+            </div>
+            <p id="type-feedback" style="text-align:center; font-weight:bold; font-size:14px; height:20px; margin: 0;"></p>
+        </div>
     </div>
 
     <!-- TAB DANH SÁCH -->
     <div id="tab-manager" class="tab-content" style="display: none;">
+        <div class="search-box-wrapper">
+            <input type="text" id="vocab-search-input" class="search-input" placeholder="🔍 Nhập Kanji, Hán Việt hoặc Ý nghĩa để tra từ..." oninput="filterManagerList()">
+        </div>
+
         <h3 id="manager-title" style="margin:2px 0 6px 0; font-size:14px; color:var(--primary);">Danh sách</h3>
         <div class="vocab-table-wrapper">
             <table class="vocab-table">
@@ -325,7 +422,6 @@
     </div>
 </div>
 
-<!-- POPUP CHI TIẾT TỪ VỰNG -->
 <div id="kanji-popup" class="modal-overlay" onclick="closeKanjiPopup()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeKanjiPopup()">&times;</span>
@@ -335,7 +431,8 @@
         <div id="modal-meaning-text" class="modal-meaning"></div>
         <hr class="modal-divider">
         <div id="modal-example-jp" class="modal-example-jp"></div>
-        <div id="modal-example-vi" class="modal-example-vi"></div>
+        <!-- THÊM LỚP LÀM MỜ BLUR-BOX CHO DỊCH NGHĨA POPUP -->
+        <div id="modal-example-vi" class="modal-example-vi blur-box" onclick="revealBlur(event, this)"></div>
     </div>
 </div>
 
@@ -371,18 +468,17 @@
 
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
         "N1_Mondai_Demo": [
+            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm (chế tạo) rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
             { kanji: "圧倒的", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強さで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
             { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false }
         ]
     };
     let currentList = [], activeWordIndex = 0, currentSheetName = "";
+    let typingStats = { correct: 0, wrong: 0, total: 0 };
 
     window.onload = () => { 
         updateThemeToggleIcon();
         initSheetSelect(); 
-        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = () => {};
-        }
     };
 
     function toggleTheme() {
@@ -410,6 +506,15 @@
             }
         }
         return result.length > 0 ? result.join(" ") : "";
+    }
+
+    // HÀM TỰ ĐỘNG TÌM VÀ ĐỔI MÀU (HIGHLIGHT) TỪ VỰNG TRONG CÂU VÍ DỤ TIẾNG NHẬT
+    function highlightKeyword(sentence, keyword) {
+        if (!sentence || !keyword) return sentence || '';
+        // Thoát các ký tự đặc biệt nếu có
+        const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(escapedKeyword, 'g');
+        return sentence.replace(regex, `<mark class="highlight-word">${keyword}</mark>`);
     }
 
     function initSheetSelect() {
@@ -493,8 +598,12 @@
         currentSheetName = selectVal || Object.keys(db).filter(k => k !== '_amHanViet')[0];
         if (!currentSheetName) return;
         document.getElementById('only-bookmarked').checked = false;
+        
+        const searchInput = document.getElementById('vocab-search-input');
+        if(searchInput) searchInput.value = '';
+
         currentList = (db[currentSheetName] || []).map(w => { w.hanviet = autoTranslateHanViet(w.kanji); return w; });
-        activeWordIndex = 0; updateFlashcard(); initTyping();
+        activeWordIndex = 0; updateFlashcard(); resetTypingCounters();
         if(document.getElementById('tab-manager').style.display === 'flex') { renderManagerList(); }
     }
 
@@ -504,15 +613,23 @@
         document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.mode-btn').forEach(el => el.classList.remove('active'));
         
-        // Đổi trạng thái hiển thị sang flex để kích hoạt chiều cao co giãn động
         document.getElementById(tabId).style.display = 'flex';
         if(btn) btn.classList.add('active');
-        if(tabId === 'tab-manager') renderManagerList();
-        if(tabId === 'tab-typing') initTyping();
+        if(tabId === 'tab-manager') {
+            document.getElementById('vocab-search-input').value = '';
+            renderManagerList();
+        }
+        if(tabId === 'tab-typing') { updateTypingStatsUI(); setTimeout(() => document.getElementById('type-input').focus(), 150); }
     }
 
     function updateFlashcard() {
-        if(currentList.length === 0) { document.getElementById('fc-front-text').innerText = "Trống"; return; }
+        if(currentList.length === 0) { 
+            document.getElementById('fc-front-text').innerText = "Trống"; 
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('progress-text').innerText = `Tiến độ: 0%`;
+            document.getElementById('card-counter').innerText = `0 / 0`;
+            return; 
+        }
         const word = currentList[activeWordIndex];
         document.getElementById('fc-front-text').innerText = word.kanji;
         
@@ -525,20 +642,59 @@
         document.getElementById('fc-meaning').innerText = word.meaning;
 
         const sameBox = document.getElementById('fc-same-box');
-        if (word.synonym) { document.getElementById('fc-same').innerText = word.synonym; sameBox.style.display = 'block'; } else { sameBox.style.display = 'none'; }
+        if (word.synonym) { 
+            const sameEl = document.getElementById('fc-same');
+            sameEl.innerText = word.synonym; 
+            sameEl.classList.remove('revealed');
+            sameBox.style.display = 'block'; 
+        } else { sameBox.style.display = 'none'; }
 
         const exBox = document.getElementById('fc-ex-box');
         if (word.exampleJp) {
-            document.getElementById('fc-ex-jp').innerText = word.exampleJp;
-            document.getElementById('fc-ex-vi').innerText = word.exampleVi || '';
+            // SỬ DỤNG HÀM HIGHLIGHT TỪ VỰNG TRÊN FLASHCARD
+            document.getElementById('fc-ex-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
+            const viEl = document.getElementById('fc-ex-vi');
+            viEl.innerText = word.exampleVi || 'Chưa có bản dịch';
+            viEl.classList.remove('revealed'); 
             exBox.style.display = 'flex';
         } else { exBox.style.display = 'none'; }
 
-        document.getElementById('card-counter').innerText = `${activeWordIndex + 1} / ${currentList.length}`;
-        document.getElementById('flashcard-container').classList.remove('flipped');
+        const total = currentList.length;
+        const currentPos = activeWordIndex + 1;
+        const pct = Math.round((currentPos / total) * 100);
         
+        document.getElementById('card-counter').innerText = `${currentPos} / ${total}`;
+        document.getElementById('progress-fill').style.width = `${pct}%`;
+        document.getElementById('progress-text').innerText = `Tiến độ: ${pct}%`;
+        
+        document.getElementById('flashcard-container').classList.remove('flipped');
         document.getElementById('fc-gemini').href = `https://gemini.google.com/?q=Phân tích từ vựng N1: "${word.kanji}"`;
-        document.getElementById('fc-mazii').href = `https://mazii.net/vi-VN/search/word/ja/${encodeURIComponent(word.kanji)}`;
+    }
+
+    function openMaziiApp(e) {
+        if(e) e.stopPropagation();
+        if(currentList.length === 0) return;
+        const word = currentList[activeWordIndex];
+        const keyword = encodeURIComponent(word.kanji);
+        
+        const deepLink = `mazii://search/word/ja/${keyword}`;
+        const webLink = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
+        
+        const start = Date.now();
+        window.location.href = deepLink;
+        
+        setTimeout(() => {
+            if (Date.now() - start < 1500) {
+                window.open(webLink, '_blank');
+            }
+        }, 1000);
+    }
+
+    function handleDifficulty(level, event) {
+        if(event) event.stopPropagation();
+        if(currentList.length === 0) return;
+        console.log(`Từ [${currentList[activeWordIndex].kanji}] mức độ: ${level}`);
+        nextCard();
     }
 
     function flipCard() {
@@ -567,6 +723,10 @@
         const full = db[currentSheetName] || [];
         currentList = document.getElementById('only-bookmarked').checked ? full.filter(w => w.starred) : [...full];
         if(currentList.length === 0) { alert("Chưa có thẻ đánh dấu!"); document.getElementById('only-bookmarked').checked = false; currentList = [...full]; }
+        
+        const searchInput = document.getElementById('vocab-search-input');
+        if(searchInput) searchInput.value = '';
+
         activeWordIndex = 0; updateFlashcard();
     }
 
@@ -574,27 +734,31 @@
         if(e) e.stopPropagation(); 
         if(!text) return;
         window.speechSynthesis.cancel(); 
-        const u = new SpeechSynthesisUtterance(text); 
+        const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>/g, '')); // Loại bỏ thẻ html trước khi đọc âm thanh
         u.lang = 'ja-JP'; u.rate = 0.88;
-        if (typeof speechSynthesis !== 'undefined') {
-            const voices = speechSynthesis.getVoices();
-            const jaVoices = voices.filter(v => v.lang.startsWith('ja'));
-            const siriVoice = jaVoices.find(v => v.name.includes('Otoya') || v.name.includes('Siri') || v.name.includes('Premium'));
-            if (siriVoice) u.voice = siriVoice;
-            else if (jaVoices.length > 0) u.voice = jaVoices[0];
-        }
         window.speechSynthesis.speak(u); 
     }
     function speakCurrentWord(e) { const w = currentList[activeWordIndex]; speakJapaneseText(e, w.kana || w.kanji); }
     function speakCurrentExample(e) { speakJapaneseText(e, currentList[activeWordIndex].exampleJp); }
-    function revealBlur(e, el) { e.stopPropagation(); el.classList.toggle('revealed'); }
-
-    let typeScore = 0, typeCurrent = null;
     
-    function initTyping() { 
-        typeScore = 0; 
-        document.getElementById('type-score').innerText = typeScore; 
-        loadNextType(); 
+    function revealBlur(e, el) { 
+        if(e) e.stopPropagation(); 
+        el.classList.toggle('revealed'); 
+    }
+
+    /* LOGIC PHẦN GÕ TỪ */
+    let typeCurrent = null;
+    
+    function resetTypingCounters() {
+        typingStats = { correct: 0, wrong: 0, total: 0 };
+        updateTypingStatsUI();
+        loadNextType();
+    }
+
+    function updateTypingStatsUI() {
+        document.getElementById('type-correct-count').innerText = typingStats.correct;
+        document.getElementById('type-wrong-count').innerText = typingStats.wrong;
+        document.getElementById('type-total-count').innerText = typingStats.total;
     }
     
     function loadNextType() { 
@@ -625,38 +789,65 @@
             if (!v) return;
             
             i.disabled = true; 
+            typingStats.total += 1;
+
             if (v === typeCurrent.kana.toLowerCase()) { 
-                typeScore += 10; 
-                document.getElementById('type-score').innerText = typeScore; 
-                document.getElementById('type-feedback').style.color = 'var(--primary)'; 
+                typingStats.correct += 1;
+                updateTypingStatsUI();
+                document.getElementById('type-feedback').style.color = 'var(--success)'; 
                 document.getElementById('type-feedback').innerText = 'Chính xác! 🎉'; 
-                setTimeout(loadNextType, 1000); 
+                setTimeout(loadNextType, 800); 
             } else { 
-                document.getElementById('type-feedback').style.color = 'var(--accent)'; 
+                typingStats.wrong += 1;
+                updateTypingStatsUI();
+                document.getElementById('type-feedback').style.color = 'var(--error)'; 
                 document.getElementById('type-feedback').innerText = `Sai rồi! Đáp án: ${typeCurrent.kana}`; 
-                setTimeout(loadNextType, 2000); 
+                setTimeout(loadNextType, 1800); 
             } 
         } 
     }
 
     function skipTyping() {
         if (!typeCurrent) return;
+        typingStats.total += 1;
+        typingStats.wrong += 1;
+        updateTypingStatsUI();
+
         document.getElementById('type-feedback').style.color = 'var(--text-muted)';
-        document.getElementById('type-feedback').innerText = `Đáp án: ${typeCurrent.kana}`;
+        document.getElementById('type-feedback').innerText = `Đáp án đúng: ${typeCurrent.kana}`;
         document.getElementById('type-input').disabled = true;
-        setTimeout(loadNextType, 1500);
+        setTimeout(loadNextType, 1200);
     }
 
     function renderManagerList() {
         document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`;
-        const tbody = document.getElementById('vocab-list-tbody'); tbody.innerHTML = '';
-        const listData = db[currentSheetName] || [];
-        listData.forEach((w, index) => {
+        filterManagerList(); 
+    }
+
+    function filterManagerList() {
+        const keyword = document.getElementById('vocab-search-input').value.trim().toLowerCase();
+        const tbody = document.getElementById('vocab-list-tbody'); 
+        tbody.innerHTML = '';
+        
+        const baseDataList = currentList; 
+        
+        baseDataList.forEach((w, index) => {
+            const kj = (w.kanji || '').toLowerCase();
+            const hv = (w.hanviet || autoTranslateHanViet(w.kanji)).toLowerCase();
+            const mn = (w.meaning || '').toLowerCase();
+            const kn = (w.kana || '').toLowerCase();
+
+            if (keyword && !kj.includes(keyword) && !hv.includes(keyword) && !mn.includes(keyword) && !kn.includes(keyword)) {
+                return; 
+            }
+
             let tr = document.createElement('tr');
-            tr.onclick = () => showKanjiPopup(index);
+            const originalIndexInSheet = (db[currentSheetName] || []).findIndex(orig => orig.kanji === w.kanji);
+
+            tr.onclick = () => showKanjiPopup(originalIndexInSheet !== -1 ? originalIndexInSheet : index);
             tr.innerHTML = `
-                <td>${index + 2}</td>
-                <td onclick="event.stopPropagation(); toggleStarFromList(${index})">${w.starred ? '⭐' : '☆'}</td>
+                <td>${originalIndexInSheet !== -1 ? originalIndexInSheet + 2 : index + 2}</td>
+                <td onclick="event.stopPropagation(); toggleStarFromList(${originalIndexInSheet !== -1 ? originalIndexInSheet : index})">${w.starred ? '⭐' : '☆'}</td>
                 <td>${w.flipCount || 0}</td>
                 <td style="font-weight: bold; color: var(--primary); text-decoration: underline dotted;">${w.kanji}</td>
                 <td style="color: var(--accent); font-weight: bold; text-transform: uppercase;">${w.hanviet || autoTranslateHanViet(w.kanji)}</td>
@@ -672,11 +863,20 @@
         if (listData[index]) {
             listData[index].starred = !listData[index].starred;
             saveToLocalStorage();
-            renderManagerList();
+            
+            const full = db[currentSheetName] || [];
+            if(document.getElementById('only-bookmarked').checked) {
+                currentList = full.filter(w => w.starred);
+            } else {
+                currentList = [...full];
+            }
+            
+            filterManagerList(); 
             updateFlashcard();
         }
     }
 
+    /* ĐỔI MỚI TOÀN BỘ LOGIC HIỂN THỊ CỦA BẢNG POPUP */
     function showKanjiPopup(index) {
         const listData = db[currentSheetName] || [];
         const word = listData[index]; if (!word) return;
@@ -684,12 +884,20 @@
         document.getElementById('modal-hanviet-text').innerText = word.hanviet || autoTranslateHanViet(word.kanji);
         document.getElementById('modal-kana-text').innerText = word.kana ? `[ ${word.kana} ]` : '';
         document.getElementById('modal-meaning-text').innerText = word.meaning;
+        
+        // Mặc định thiết lập trạng thái làm mờ ban đầu cho câu ví dụ trong popup
+        const modalViEl = document.getElementById('modal-example-vi');
+        modalViEl.classList.remove('revealed'); 
+
         if (word.exampleJp) {
-            document.getElementById('modal-example-jp').innerText = word.exampleJp;
-            document.getElementById('modal-example-vi').innerText = word.exampleVi || '';
+            // SỬ DỤNG HÀM HIGHLIGHT TỪ VỰNG CHÍNH TRONG POPUP
+            document.getElementById('modal-example-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
+            modalViEl.innerText = word.exampleVi || 'Chưa có bản dịch';
+            modalViEl.style.display = 'inline-block';
         } else {
             document.getElementById('modal-example-jp').innerText = 'Chưa cập nhật ví dụ.';
-            document.getElementById('modal-example-vi').innerText = '';
+            modalViEl.innerText = '';
+            modalViEl.style.display = 'none';
         }
         document.getElementById('kanji-popup').style.display = 'flex';
     }
