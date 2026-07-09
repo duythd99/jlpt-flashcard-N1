@@ -6,7 +6,7 @@
     <title>Flashcard JLPT N1 🌸</title>
     
     <link class="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link class="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="N1 Flashcard">
@@ -259,12 +259,14 @@
         .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 35px 24px 28px 24px; text-align: center; position: relative; width: 88%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 2011; }
         .modal-close { position: absolute; top: 10px; right: 16px; font-size: 22px; cursor: pointer; color: var(--text-muted); }
         .modal-kanji { font-size: 56px; font-weight: bold; color: var(--primary); font-family: "Hiragino Mincho ProN", serif; }
-        .modal-hanviet { margin-top: 8px; font-size: 16px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; }
+        .modal-hanviet { margin-top: 8px; font-size: 16px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin: 0; }
         .modal-kana { margin-top: 4px; font-size: 15px; color: var(--text-color); }
         .modal-meaning { margin-top: 8px; font-size: 18px; font-weight: 600; }
         .modal-divider { border: none; border-top: 1px dashed var(--border-color); margin: 16px 0; }
         .modal-example-jp { font-size: 15px; color: var(--text-color); line-height: 1.4; margin-bottom: 6px; }
         .modal-example-vi { font-size: 13px; color: var(--text-muted); line-height: 1.4; display: inline-block; }
+        .modal-action-btn { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
+        .modal-action-btn:hover { background-color: var(--primary); color: white; }
     </style>
 </head>
 <body>
@@ -431,8 +433,10 @@
         <div id="modal-meaning-text" class="modal-meaning"></div>
         <hr class="modal-divider">
         <div id="modal-example-jp" class="modal-example-jp"></div>
-        <!-- THÊM LỚP LÀM MỜ BLUR-BOX CHO DỊCH NGHĨA POPUP -->
         <div id="modal-example-vi" class="modal-example-vi blur-box" onclick="revealBlur(event, this)"></div>
+        <div>
+            <button class="modal-action-btn" onclick="openMaziiFromPopup()">📖 Tra từ điển Mazii</button>
+        </div>
     </div>
 </div>
 
@@ -448,6 +452,7 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
     })();
 
+    // Giải phóng Audio cho iOS Safari
     function unlockAudio() {
         try {
             window.speechSynthesis.cancel();
@@ -475,6 +480,7 @@
     };
     let currentList = [], activeWordIndex = 0, currentSheetName = "";
     let typingStats = { correct: 0, wrong: 0, total: 0 };
+    let currentUtterance = null; // Biến toàn cục ngăn iOS Garbage Collection làm mất tiếng
 
     window.onload = () => { 
         updateThemeToggleIcon();
@@ -508,10 +514,8 @@
         return result.length > 0 ? result.join(" ") : "";
     }
 
-    // HÀM TỰ ĐỘNG TÌM VÀ ĐỔI MÀU (HIGHLIGHT) TỪ VỰNG TRONG CÂU VÍ DỤ TIẾNG NHẬT
     function highlightKeyword(sentence, keyword) {
         if (!sentence || !keyword) return sentence || '';
-        // Thoát các ký tự đặc biệt nếu có
         const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         const regex = new RegExp(escapedKeyword, 'g');
         return sentence.replace(regex, `<mark class="highlight-word">${keyword}</mark>`);
@@ -651,7 +655,6 @@
 
         const exBox = document.getElementById('fc-ex-box');
         if (word.exampleJp) {
-            // SỬ DỤNG HÀM HIGHLIGHT TỪ VỰNG TRÊN FLASHCARD
             document.getElementById('fc-ex-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
             const viEl = document.getElementById('fc-ex-vi');
             viEl.innerText = word.exampleVi || 'Chưa có bản dịch';
@@ -671,23 +674,35 @@
         document.getElementById('fc-gemini').href = `https://gemini.google.com/?q=Phân tích từ vựng N1: "${word.kanji}"`;
     }
 
+    // XỬ LÝ ĐIỀU HƯỚNG DEEP LINK ĐẾN APP MAZII HOẶC WEB MAZII
     function openMaziiApp(e) {
         if(e) e.stopPropagation();
         if(currentList.length === 0) return;
         const word = currentList[activeWordIndex];
-        const keyword = encodeURIComponent(word.kanji);
-        
+        executeMaziiSearch(word.kanji);
+    }
+
+    function openMaziiFromPopup() {
+        const kanjiText = document.getElementById('modal-kanji-text').innerText;
+        if(!kanjiText || kanjiText === '-') return;
+        executeMaziiSearch(kanjiText);
+    }
+
+    function executeMaziiSearch(text) {
+        const keyword = encodeURIComponent(text);
         const deepLink = `mazii://search/word/ja/${keyword}`;
         const webLink = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
         
         const start = Date.now();
+        // Cố gắng kích hoạt mở app trên điện thoại
         window.location.href = deepLink;
         
+        // Cơ chế Fallback: Nếu sau 1.2 giây không thấy app phản hồi (nghĩa là chưa cài app), tự động mở trình duyệt web
         setTimeout(() => {
             if (Date.now() - start < 1500) {
                 window.open(webLink, '_blank');
             }
-        }, 1000);
+        }, 1200);
     }
 
     function handleDifficulty(level, event) {
@@ -727,17 +742,43 @@
         const searchInput = document.getElementById('vocab-search-input');
         if(searchInput) searchInput.value = '';
 
-        activeWordIndex = 0; updateFlashcard();
+        activeWordIndex = 0; 
+        updateFlashcard();
+        filterManagerList(); 
     }
 
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
         if(!text) return;
-        window.speechSynthesis.cancel(); 
-        const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>/g, '')); // Loại bỏ thẻ html trước khi đọc âm thanh
-        u.lang = 'ja-JP'; u.rate = 0.88;
-        window.speechSynthesis.speak(u); 
+
+        try {
+            window.speechSynthesis.cancel();
+        } catch(err) { console.log(err); }
+        
+        const cleanText = text.replace(/<[^>]*>/g, '');
+        
+        currentUtterance = new SpeechSynthesisUtterance(cleanText); 
+        currentUtterance.lang = 'ja-JP'; 
+        currentUtterance.rate = 0.95;
+        
+        if (window.speechSynthesis.getVoices) {
+            const voices = window.speechSynthesis.getVoices();
+            let premiumVoice = voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('siri')) ||
+                               voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('premium')) ||
+                               voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('kyoko')) ||
+                               voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('otoya')) ||
+                               voices.find(v => v.lang.startsWith('ja'));
+            
+            if (premiumVoice) {
+                currentUtterance.voice = premiumVoice;
+            }
+        }
+        
+        setTimeout(() => {
+            window.speechSynthesis.speak(currentUtterance); 
+        }, 50);
     }
+    
     function speakCurrentWord(e) { const w = currentList[activeWordIndex]; speakJapaneseText(e, w.kana || w.kanji); }
     function speakCurrentExample(e) { speakJapaneseText(e, currentList[activeWordIndex].exampleJp); }
     
@@ -829,7 +870,9 @@
         const tbody = document.getElementById('vocab-list-tbody'); 
         tbody.innerHTML = '';
         
-        const baseDataList = currentList; 
+        const isOnlyBookmarked = document.getElementById('only-bookmarked').checked;
+        const fullList = db[currentSheetName] || [];
+        const baseDataList = isOnlyBookmarked ? fullList.filter(w => w.starred) : fullList; 
         
         baseDataList.forEach((w, index) => {
             const kj = (w.kanji || '').toLowerCase();
@@ -842,7 +885,7 @@
             }
 
             let tr = document.createElement('tr');
-            const originalIndexInSheet = (db[currentSheetName] || []).findIndex(orig => orig.kanji === w.kanji);
+            const originalIndexInSheet = fullList.findIndex(orig => orig.kanji === w.kanji);
 
             tr.onclick = () => showKanjiPopup(originalIndexInSheet !== -1 ? originalIndexInSheet : index);
             tr.innerHTML = `
@@ -876,7 +919,6 @@
         }
     }
 
-    /* ĐỔI MỚI TOÀN BỘ LOGIC HIỂN THỊ CỦA BẢNG POPUP */
     function showKanjiPopup(index) {
         const listData = db[currentSheetName] || [];
         const word = listData[index]; if (!word) return;
@@ -885,12 +927,10 @@
         document.getElementById('modal-kana-text').innerText = word.kana ? `[ ${word.kana} ]` : '';
         document.getElementById('modal-meaning-text').innerText = word.meaning;
         
-        // Mặc định thiết lập trạng thái làm mờ ban đầu cho câu ví dụ trong popup
         const modalViEl = document.getElementById('modal-example-vi');
         modalViEl.classList.remove('revealed'); 
 
         if (word.exampleJp) {
-            // SỬ DỤNG HÀM HIGHLIGHT TỪ VỰNG CHÍNH TRONG POPUP
             document.getElementById('modal-example-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
             modalViEl.innerText = word.exampleVi || 'Chưa có bản dịch';
             modalViEl.style.display = 'inline-block';
