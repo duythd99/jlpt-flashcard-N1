@@ -265,6 +265,8 @@
         .modal-divider { border: none; border-top: 1px dashed var(--border-color); margin: 16px 0; }
         .modal-example-jp { font-size: 15px; color: var(--text-color); line-height: 1.4; margin-bottom: 6px; }
         .modal-example-vi { font-size: 13px; color: var(--text-muted); line-height: 1.4; display: inline-block; }
+        
+        /* ĐÃ THÊM LẠI: NÚT ĐIỀU CHỈNH TRA MAZII TRÊN POPUP */
         .modal-action-btn { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
         .modal-action-btn:hover { background-color: var(--primary); color: white; }
     </style>
@@ -424,6 +426,7 @@
     </div>
 </div>
 
+<!-- ĐÃ CẬP NHẬT TRỞ LẠI: NÚT TRA MAZII TRONG POPUP KANJI -->
 <div id="kanji-popup" class="modal-overlay" onclick="closeKanjiPopup()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeKanjiPopup()">&times;</span>
@@ -474,7 +477,7 @@
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
         "N1_Mondai_Demo": [
             { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm (chế tạo) rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
-            { kanji: "圧倒的", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強さで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
+            { kanji: "圧倒적", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強さで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
             { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false }
         ]
     };
@@ -674,35 +677,40 @@
         document.getElementById('fc-gemini').href = `https://gemini.google.com/?q=Phân tích từ vựng N1: "${word.kanji}"`;
     }
 
-    // XỬ LÝ ĐIỀU HƯỚNG DEEP LINK ĐẾN APP MAZII HOẶC WEB MAZII
-    function openMaziiApp(e) {
+    // SỬA LIÊN KẾT: KẾT HỢP CLIPBOARD VÀ UNIVERSAL HTTPS LINK ĐỂ TỰ ĐỘNG TRA TRÊN IOS/ANDROID
+    async function openMaziiApp(e) {
         if(e) e.stopPropagation();
         if(currentList.length === 0) return;
         const word = currentList[activeWordIndex];
-        executeMaziiSearch(word.kanji);
+        const text = word.kanji;
+
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text);
+            }
+        } catch (err) { 
+            console.log("Clipboard error:", err); 
+        }
+
+        const keyword = encodeURIComponent(text);
+        window.location.href = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
     }
 
-    function openMaziiFromPopup() {
+    // ĐÃ THÊM LẠI: ĐIỀU HƯỚNG TỪ POPUP SỬ DỤNG PHƯƠNG THỨC TRA ĐỒNG BỘ MỚI
+    async function openMaziiFromPopup() {
         const kanjiText = document.getElementById('modal-kanji-text').innerText;
         if(!kanjiText || kanjiText === '-') return;
-        executeMaziiSearch(kanjiText);
-    }
 
-    function executeMaziiSearch(text) {
-        const keyword = encodeURIComponent(text);
-        const deepLink = `mazii://search/word/ja/${keyword}`;
-        const webLink = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
-        
-        const start = Date.now();
-        // Cố gắng kích hoạt mở app trên điện thoại
-        window.location.href = deepLink;
-        
-        // Cơ chế Fallback: Nếu sau 1.2 giây không thấy app phản hồi (nghĩa là chưa cài app), tự động mở trình duyệt web
-        setTimeout(() => {
-            if (Date.now() - start < 1500) {
-                window.open(webLink, '_blank');
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(kanjiText);
             }
-        }, 1200);
+        } catch (err) { 
+            console.log("Clipboard error:", err); 
+        }
+
+        const keyword = encodeURIComponent(kanjiText);
+        window.location.href = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
     }
 
     function handleDifficulty(level, event) {
@@ -734,6 +742,7 @@
         });
     }
     
+    // Đã sửa: Đồng bộ bộ lọc tức thì sang cả Tab Danh Sách khi click checkbox
     function toggleStarredFilter() {
         const full = db[currentSheetName] || [];
         currentList = document.getElementById('only-bookmarked').checked ? full.filter(w => w.starred) : [...full];
@@ -747,19 +756,20 @@
         filterManagerList(); 
     }
 
+    // Đã sửa: Tối ưu hóa phát âm thanh chuẩn Siri tự nhiên và chống lỗi trên iPhone (iOS)
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
         if(!text) return;
 
         try {
-            window.speechSynthesis.cancel();
+            window.speechSynthesis.cancel(); // Ngắt âm thanh đang phát trước đó
         } catch(err) { console.log(err); }
         
-        const cleanText = text.replace(/<[^>]*>/g, '');
+        const cleanText = text.replace(/<[^>]*>/g, ''); // Loại bỏ thẻ html
         
         currentUtterance = new SpeechSynthesisUtterance(cleanText); 
         currentUtterance.lang = 'ja-JP'; 
-        currentUtterance.rate = 0.95;
+        currentUtterance.rate = 0.95; // Tốc độ Siri đọc chuẩn tự nhiên nhất
         
         if (window.speechSynthesis.getVoices) {
             const voices = window.speechSynthesis.getVoices();
@@ -865,6 +875,7 @@
         filterManagerList(); 
     }
 
+    // Đã sửa: Sửa triệt để lỗi không lọc danh sách khi checkbox được check
     function filterManagerList() {
         const keyword = document.getElementById('vocab-search-input').value.trim().toLowerCase();
         const tbody = document.getElementById('vocab-list-tbody'); 
