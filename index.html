@@ -11,9 +11,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="N1 Flashcard">
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* BẢNG MÀU CHUẨN PASTEL */
+        /* BẢNG MÀU CHUẨN PASTEL (SAGE & SKY PALETTE) */
         :root[data-theme="light"] {
             --bg-color: #F8FAF8;
             --card-bg: #FFFFFF;
@@ -35,7 +40,7 @@
 
         :root[data-theme="dark"] {
             --bg-color: #1F2937;
-            --card-bg: #203748;
+            --card-bg: #2D3748;
             --primary: #9FD3C7;
             --secondary: #8ECAE6;
             --accent: #F6BD60;
@@ -44,16 +49,16 @@
             --error: #FF6B6B;
             --text-color: #F8F9FA;
             --text-muted: #CBD5E1;
-            --border-color: #2D3748;
+            --border-color: #4A5568;
             --blur-bg: #4A5568;
-            --option-bg: #203748;
+            --option-bg: #2D3748;
             --option-text: #F8F9FA;
             --highlight-bg: rgba(246, 189, 96, 0.25);
             --highlight-text: #F6BD60;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -82,7 +87,6 @@
         
         .theme-toggle-btn {
             position: absolute;
-            right: 0;
             background: transparent;
             border: none;
             font-size: 20px;
@@ -90,7 +94,11 @@
             padding: 4px;
             line-height: 1;
             user-select: none;
+            transition: color 0.2s;
         }
+        /* Đặt nút sáng/tối và offline cạnh nhau */
+        #theme-toggle { right: 0; }
+        #offline-toggle { right: 38px; font-size: 19px;}
 
         .container { 
             width: 100%; 
@@ -116,39 +124,33 @@
         .select-wrapper { display: flex; align-items: center; gap: 6px; flex: 1; }
         .select-wrapper label { font-size: 13px; font-weight: bold; color: var(--text-muted); white-space: nowrap; }
         select { width: 100%; background-color: transparent; color: var(--text-color); border: none; padding: 4px 0; font-size: 14px; outline: none; font-weight: 600; cursor: pointer; }
-        
-        select option {
-            background-color: var(--option-bg);
-            color: var(--option-text);
-        }
+        select option { background-color: var(--option-bg); color: var(--option-text); }
 
         .file-input-label {
             display: inline-flex;
             align-items: center;
-            background-color: var(--primary);
-            color: white;
+            background-color: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
             padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
             font-weight: bold;
             white-space: nowrap;
+            transition: all 0.2s;
         }
+        .file-input-label:hover { background-color: var(--primary); color: white; }
         #excel-file { display: none; }
 
         .bookmark-filter { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--text-muted); margin: -2px 0; cursor: pointer; font-weight: 500; }
 
         .mode-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .mode-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 12px 2px; border-radius: 12px; font-size: 13px; cursor: pointer; font-weight: 600; text-align: center; }
-        .mode-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .mode-btn { background-color: transparent; color: var(--text-muted); border: 1.5px solid var(--border-color); padding: 12px 2px; border-radius: 12px; font-size: 13px; cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s;}
+        .mode-btn.active { background-color: rgba(127, 182, 155, 0.15); color: var(--primary); border-color: var(--primary); }
+        :root[data-theme="dark"] .mode-btn.active { background-color: rgba(159, 211, 199, 0.15); }
 
-        .tab-content {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            flex: 1;
-            overflow: hidden;
-        }
+        .tab-content { display: none; flex-direction: column; width: 100%; flex: 1; overflow: hidden; }
 
         /* CARD STYLE */
         .flashcard { width: 100%; height: 320px; perspective: 1000px; margin: 4px 0; cursor: pointer; }
@@ -166,7 +168,7 @@
         .star-icon { left: 15px; }
         .eye-icon { right: 15px; font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-        .word-main { font-size: 48px; font-weight: bold; margin: 0; color: var(--text-color); font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; }
+        .word-main { font-size: 52px; font-weight: bold; margin: 0; color: var(--text-color); font-family: "Noto Sans JP", sans-serif; }
         .audio-btn { background: rgba(124, 181, 155, 0.15); border: none; color: var(--primary); border-radius: 50%; width: 32px; height: 32px; font-size: 13px; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
 
         .fb-container-top { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
@@ -177,32 +179,46 @@
         .blur-box { filter: blur(6px); background: var(--blur-bg); border-radius: 6px; padding: 2px 10px; cursor: pointer; color: transparent; display: inline-block; transition: filter 0.25s; user-select: none; }
         .blur-box.revealed { filter: none; background: transparent; color: inherit; user-select: text; }
 
-        /* CSS STYLE HIGHLIGHT CHO TỪ VỰNG TRONG CÂU */
-        mark.highlight-word {
-            background-color: var(--highlight-bg);
-            color: var(--highlight-text);
-            font-weight: bold;
-            padding: 0 4px;
-            border-radius: 4px;
-        }
+        mark.highlight-word { background-color: var(--highlight-bg); color: var(--highlight-text); font-weight: bold; padding: 0 4px; border-radius: 4px; }
 
-        .nav-buttons { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; margin-top: 4px; }
-        .nav-btn { flex: 1; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .nav-btn.btn-secondary { background-color: var(--secondary); color: var(--text-color); max-width: 90px; }
+        /* Cân đối thiết kế Nav Buttons theo image_c59659.png */
+        .nav-buttons { display: flex; justify-content: space-between; align-items: stretch; width: 100%; gap: 10px; margin-top: 4px; }
+        .nav-btn { padding: 14px 4px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 15px; border: 1.5px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         
+        .nav-btn.btn-prev { flex: 1.1; background-color: transparent; color: var(--text-color); border-color: var(--border-color); }
+        .nav-btn.btn-prev:active { background-color: rgba(127,182,155,0.05); }
+        
+        .nav-btn.btn-secondary { flex: 0.8; background-color: var(--secondary); color: #1F2937; }
+        :root[data-theme="dark"] .nav-btn.btn-secondary { color: #1F2937; }
+        
+        .nav-btn.btn-next { flex: 1.1; background-color: var(--primary); color: #1F2937; }
+        :root[data-theme="dark"] .nav-btn.btn-next { color: #1F2937; }
+
         .progress-container { width: 100%; display: flex; flex-direction: column; gap: 4px; margin: 2px 0; }
         .progress-bar-bg { width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; background-color: var(--success); transition: width 0.3s ease; }
         .progress-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); }
 
+        /* Cân đối nút Độ khó và Icon */
         .difficulty-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin: 8px 0; }
-        .diff-btn { border: none; padding: 12px 4px; border-radius: 12px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 0.1s; }
+        .diff-btn { background-color: transparent; border: 1.5px solid; padding: 10px 4px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: transform 0.1s, background-color 0.2s; }
         .diff-btn:active { transform: scale(0.96); }
-        .diff-again { background-color: var(--error); }
-        .diff-hard { background-color: var(--accent); }
-        .diff-good { background-color: var(--primary); }
-        .diff-easy { background-color: var(--secondary); color: #2D3436; }
-        .diff-btn span { font-size: 11px; font-weight: normal; opacity: 0.9; }
+        
+        .diff-icon { font-size: 16px; margin-bottom: 2px; }
+
+        .diff-again { color: var(--error); border-color: var(--error); }
+        .diff-again:hover { background-color: rgba(231, 111, 81, 0.05); }
+        
+        .diff-hard { color: var(--warning); border-color: var(--warning); }
+        .diff-hard:hover { background-color: rgba(233, 196, 106, 0.05); }
+        
+        .diff-good { color: var(--success); border-color: var(--success); }
+        .diff-good:hover { background-color: rgba(116, 198, 157, 0.05); }
+        
+        .diff-easy { color: var(--primary); border-color: var(--primary); }
+        .diff-easy:hover { background-color: rgba(127, 182, 155, 0.05); }
+
+        .diff-btn span:last-child { font-size: 11px; font-weight: normal; opacity: 0.8; color: inherit; }
 
         footer { display: flex; justify-content: center; gap: 15px; font-size: 13px; margin-top: auto; margin-bottom: 4px; padding-top: 8px; }
         footer a { color: var(--primary); text-decoration: none; font-weight: bold; cursor: pointer; }
@@ -216,49 +232,29 @@
         .stat-val.total { color: var(--text-color); font-size: 15px; }
 
         .quiz-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .quiz-question { font-size: 56px; font-weight: bold; text-align: center; color: var(--primary); margin: 0; font-family: "Hiragino Mincho ProN", serif; }
+        .quiz-question { font-size: 56px; font-weight: bold; text-align: center; color: var(--primary); margin: 0; font-family: "Klee One", "UD Digi Kyokasho N-R", serif; }
         .quiz-hint-wrapper { text-align: center; font-size: 14px; color: var(--text-muted); }
         .quiz-hint-text { font-weight: 600; color: var(--accent); font-size: 16px; margin-top: 4px; display: block; }
 
-        .game-input { width: 100%; padding: 16px; font-size: 16px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 14px; outline: none; color: var(--text-color); box-sizing: border-box; text-align: center; font-weight: 600; transition: border-color 0.2s; }
+        .game-input { width: 100%; padding: 16px; font-size: 16px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 14px; outline: none; color: var(--text-color); box-sizing: border-box; text-align: center; font-weight: 600; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
         .game-input:focus { border-color: var(--primary); }
         .type-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
         .search-box-wrapper { width: 100%; margin-bottom: 8px; box-sizing: border-box; }
-        .search-input { width: 100%; padding: 10px 14px; font-size: 14px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; }
+        .search-input { width: 100%; padding: 10px 14px; font-size: 14px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
         .search-input:focus { border-color: var(--primary); }
 
-        .vocab-table-wrapper { 
-            flex: 1; 
-            overflow-y: auto; 
-            overflow-x: auto; 
-            border: 1px solid var(--border-color); 
-            border-radius: 16px; 
-            background: var(--card-bg); 
-            -webkit-overflow-scrolling: touch; 
-            margin-bottom: 5px;
-        }
+        .vocab-table-wrapper { flex: 1; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 16px; background: var(--card-bg); -webkit-overflow-scrolling: touch; margin-bottom: 5px; }
         .vocab-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; white-space: nowrap; }
         .vocab-table th, .vocab-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         .vocab-table th { background: var(--primary); color: white; position: sticky; top: 0; z-index: 100; font-weight: 600; }
+        :root[data-theme="dark"] .vocab-table th { color: #1F2937; }
 
-        .modal-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 2000; 
-            justify-content: center; 
-            align-items: center; 
-            backdrop-filter: blur(4px); 
-            -webkit-backdrop-filter: blur(4px);
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
         .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 35px 24px 28px 24px; text-align: center; position: relative; width: 88%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 2011; }
         .modal-close { position: absolute; top: 10px; right: 16px; font-size: 22px; cursor: pointer; color: var(--text-muted); }
-        .modal-kanji { font-size: 56px; font-weight: bold; color: var(--primary); font-family: "Hiragino Mincho ProN", serif; }
+        
+        .modal-kanji { font-size: 64px; font-weight: bold; color: var(--primary); font-family: "Klee One", "UD Digi Kyokasho N-R", serif; }
         .modal-hanviet { margin-top: 8px; font-size: 16px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin: 0; }
         .modal-kana { margin-top: 4px; font-size: 15px; color: var(--text-color); }
         .modal-meaning { margin-top: 8px; font-size: 18px; font-weight: 600; }
@@ -266,16 +262,19 @@
         .modal-example-jp { font-size: 15px; color: var(--text-color); line-height: 1.4; margin-bottom: 6px; }
         .modal-example-vi { font-size: 13px; color: var(--text-muted); line-height: 1.4; display: inline-block; }
         
-        /* ĐÃ THÊM LẠI: NÚT ĐIỀU CHỈNH TRA MAZII TRÊN POPUP */
-        .modal-action-btn { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
+        .modal-action-btn { background-color: transparent; border: 1.5px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
         .modal-action-btn:hover { background-color: var(--primary); color: white; }
+        :root[data-theme="dark"] .modal-action-btn:hover { color: #1F2937; }
     </style>
 </head>
 <body>
 
 <div class="header-row">
     <h1 class="title">Flashcard JLPT N1 🌸</h1>
-    <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">☀️</button>
+    <!-- Nút Bật/Tắt Chế độ Offline -->
+    <button id="offline-toggle" class="theme-toggle-btn" onclick="toggleOffline()" title="Bật/Tắt chế độ Offline">📶</button>
+    <!-- Nút Bật/Tắt Chế độ Sáng/Tối -->
+    <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Sáng/Tối">☀️</button>
 </div>
 
 <div class="container">
@@ -338,9 +337,9 @@
         </div>
 
         <div class="nav-buttons">
-            <button class="nav-btn" onclick="prevCard()">&larr; Trước</button>
+            <button class="nav-btn btn-prev" onclick="prevCard()">&larr; Trước</button>
             <button class="nav-btn btn-secondary" onclick="shuffleCards()">🔀 Trộn</button>
-            <button class="nav-btn" onclick="nextCard()">Tiếp &rarr;</button>
+            <button class="nav-btn btn-next" onclick="nextCard()">Tiếp &rarr;</button>
         </div>
 
         <div class="progress-container">
@@ -354,14 +353,14 @@
         </div>
 
         <div class="difficulty-panel">
-            <button class="diff-btn diff-again" onclick="handleDifficulty('again', event)">Học lại<span>Again</span></button>
-            <button class="diff-btn diff-hard" onclick="handleDifficulty('hard', event)">Khó<span>Hard</span></button>
-            <button class="diff-btn diff-good" onclick="handleDifficulty('good', event)">Tốt<span>Good</span></button>
-            <button class="diff-btn diff-easy" onclick="handleDifficulty('easy', event)">Dễ<span>Easy</span></button>
+            <button class="diff-btn diff-again" onclick="handleDifficulty('again', event)"><span class="diff-icon">🔄</span>Học lại<span>Again</span></button>
+            <button class="diff-btn diff-hard" onclick="handleDifficulty('hard', event)"><span class="diff-icon">🧠</span>Khó<span>Hard</span></button>
+            <button class="diff-btn diff-good" onclick="handleDifficulty('good', event)"><span class="diff-icon">👍</span>Tốt<span>Good</span></button>
+            <button class="diff-btn diff-easy" onclick="handleDifficulty('easy', event)"><span class="diff-icon">⭐</span>Dễ<span>Easy</span></button>
         </div>
 
         <footer>
-            <a id="fc-gemini" href="#" target="_blank">🔍 Tra Gemini</a>
+            <a id="fc-gemini" href="#" target="_blank" onclick="handleExternalLink(event)">🔍 Tra Gemini</a>
             <span style="color:var(--border-color)">|</span>
             <a onclick="openMaziiApp(event)">📖 Từ điển Mazii</a>
         </footer>
@@ -395,6 +394,8 @@
             
             <div class="type-actions">
                 <button id="type-skip-btn" class="mode-btn" style="width: 100%; padding: 14px; border-radius: 14px;" onclick="skipTyping()">Bỏ qua / Câu khác</button>
+                <!-- Nút Lịch sử gõ mới theo yêu cầu ảnh image_c58eb4.png -->
+                <button class="mode-btn" style="width: 100%; padding: 14px; border-radius: 14px; margin-top: 4px;" onclick="openTypingHistory()">📝 Xem lịch sử gõ</button>
             </div>
             <p id="type-feedback" style="text-align:center; font-weight:bold; font-size:14px; height:20px; margin: 0;"></p>
         </div>
@@ -426,7 +427,7 @@
     </div>
 </div>
 
-<!-- ĐÃ CẬP NHẬT TRỞ LẠI: NÚT TRA MAZII TRONG POPUP KANJI -->
+<!-- Modal Từ Vựng (Giữ nguyên) -->
 <div id="kanji-popup" class="modal-overlay" onclick="closeKanjiPopup()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeKanjiPopup()">&times;</span>
@@ -438,8 +439,29 @@
         <div id="modal-example-jp" class="modal-example-jp"></div>
         <div id="modal-example-vi" class="modal-example-vi blur-box" onclick="revealBlur(event, this)"></div>
         <div>
-            <button class="modal-action-btn" onclick="openMaziiFromPopup()">📖 Tra từ điển Mazii</button>
+            <button class="modal-action-btn" onclick="openMaziiFromPopup(event)">📖 Tra từ điển Mazii</button>
         </div>
+    </div>
+</div>
+
+<!-- Modal Lịch sử Gõ từ MỚI -->
+<div id="typing-history-modal" class="modal-overlay" onclick="closeTypingHistory()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh; display: flex; flex-direction: column; width: 90%; max-width: 400px; padding: 20px;">
+        <span class="modal-close" onclick="closeTypingHistory()">&times;</span>
+        <h3 style="margin-top: 0; margin-bottom: 12px; color: var(--primary);">Lịch sử gõ từ</h3>
+        <div style="flex: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-color);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+                <thead style="position: sticky; top: 0; background: var(--blur-bg); z-index: 10;">
+                    <tr>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Từ vựng</th>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Đã nhập</th>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Kết quả</th>
+                    </tr>
+                </thead>
+                <tbody id="type-history-tbody"></tbody>
+            </table>
+        </div>
+        <button class="mode-btn" style="width: 100%; padding: 12px; margin-top: 16px; color: var(--error); border-color: var(--error);" onclick="clearTypingHistory()">🗑 Làm mới danh sách</button>
     </div>
 </div>
 
@@ -455,7 +477,9 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
     })();
 
-    // Giải phóng Audio cho iOS Safari
+    // Biến trạng thái Offline
+    let isOfflineMode = false;
+
     function unlockAudio() {
         try {
             window.speechSynthesis.cancel();
@@ -482,8 +506,11 @@
         ]
     };
     let currentList = [], activeWordIndex = 0, currentSheetName = "";
+    
     let typingStats = { correct: 0, wrong: 0, total: 0 };
-    let currentUtterance = null; // Biến toàn cục ngăn iOS Garbage Collection làm mất tiếng
+    let typeHistoryList = []; // Mảng chứa lịch sử gõ từ
+    
+    let currentUtterance = null; 
 
     window.onload = () => { 
         updateThemeToggleIcon();
@@ -501,6 +528,28 @@
     function updateThemeToggleIcon() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         document.getElementById('theme-toggle').innerText = currentTheme === 'light' ? '🌙' : '☀️';
+    }
+
+    // Nút Bật/Tắt Offline
+    function toggleOffline() {
+        isOfflineMode = !isOfflineMode;
+        const iconBtn = document.getElementById('offline-toggle');
+        iconBtn.innerText = isOfflineMode ? '📴' : '📶';
+        iconBtn.style.color = isOfflineMode ? 'var(--error)' : 'inherit';
+        
+        if (isOfflineMode) {
+            alert("Đã BẬT chế độ Offline 📴.\nPhát âm thanh, tra từ điển Mazii & Gemini sẽ bị khóa để không tốn Data mạng.");
+        } else {
+            alert("Đã TẮT chế độ Offline 📶.\nCác tính năng mạng hoạt động bình thường.");
+        }
+    }
+
+    // Chặn click Link ra ngoài khi bật Offline
+    function handleExternalLink(e) {
+        if(isOfflineMode) {
+            e.preventDefault();
+            alert("Bạn đang ở chế độ Offline 📴.\nVui lòng bật lại mạng (📶) để sử dụng tính năng tra cứu ngoại tuyến!");
+        }
     }
 
     function autoTranslateHanViet(text, customDb) {
@@ -677,9 +726,14 @@
         document.getElementById('fc-gemini').href = `https://gemini.google.com/?q=Phân tích từ vựng N1: "${word.kanji}"`;
     }
 
-    // CHỈNH SỬA: ĐIỀU HƯỚNG THÔNG MINH TÁCH BIỆT LAPTOP (MỞ TAB MỚI) VÀ ĐIỆN THOẠI (MỞ APP NATIVE)
     async function openMaziiApp(e) {
         if(e) e.stopPropagation();
+        
+        if (isOfflineMode) {
+            alert("Bạn đang ở chế độ Offline 📴.\nKhông thể dùng kết nối Internet để tra từ điển Mazii!");
+            return;
+        }
+
         if(currentList.length === 0) return;
         const word = currentList[activeWordIndex];
         const text = word.kanji;
@@ -696,7 +750,6 @@
         const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
         const appUrl = `mazii://search/${keyword}`;
         
-        // Kiểm tra xem thiết bị hiện tại có phải là Mobile/Tablet hay không
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             const startTime = Date.now();
             window.location.href = appUrl;
@@ -707,13 +760,18 @@
                 }
             }, 500);
         } else {
-            // Nếu là Laptop/PC, mở thẳng trang web ở Tab mới luôn
             window.open(webUrl, '_blank');
         }
     }
 
-    // CHỈNH SỬA: ĐIỀU HƯỚNG THÔNG MINH CHO POPUP GIỮA LAPTOP (MỞ TAB MỚI) VÀ ĐIỆN THOẠI (MỞ APP NATIVE)
-    async function openMaziiFromPopup() {
+    async function openMaziiFromPopup(e) {
+        if(e) e.stopPropagation();
+
+        if (isOfflineMode) {
+            alert("Bạn đang ở chế độ Offline 📴.\nKhông thể dùng kết nối Internet để tra từ điển Mazii!");
+            return;
+        }
+
         const kanjiText = document.getElementById('modal-kanji-text').innerText;
         if(!kanjiText || kanjiText === '-') return;
 
@@ -729,7 +787,6 @@
         const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
         const appUrl = `mazii://search/${keyword}`;
         
-        // Kiểm tra xem thiết bị hiện tại có phải là Mobile/Tablet hay không
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             const startTime = Date.now();
             window.location.href = appUrl;
@@ -740,7 +797,6 @@
                 }
             }, 500);
         } else {
-            // Nếu là Laptop/PC, mở thẳng trang web ở Tab mới luôn
             window.open(webUrl, '_blank');
         }
     }
@@ -789,14 +845,17 @@
 
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
+        
+        if (isOfflineMode) {
+            alert("Đang ở chế độ Offline 📴.\nPhát âm thanh bị vô hiệu hóa để bảo vệ Data di động của bạn.");
+            return;
+        }
+
         if(!text) return;
 
-        try {
-            window.speechSynthesis.cancel(); 
-        } catch(err) { console.log(err); }
+        try { window.speechSynthesis.cancel(); } catch(err) { console.log(err); }
         
         const cleanText = text.replace(/<[^>]*>/g, ''); 
-        
         currentUtterance = new SpeechSynthesisUtterance(cleanText); 
         currentUtterance.lang = 'ja-JP'; 
         currentUtterance.rate = 0.95; 
@@ -814,9 +873,7 @@
             }
         }
         
-        setTimeout(() => {
-            window.speechSynthesis.speak(currentUtterance); 
-        }, 50);
+        setTimeout(() => { window.speechSynthesis.speak(currentUtterance); }, 50);
     }
     
     function speakCurrentWord(e) { const w = currentList[activeWordIndex]; speakJapaneseText(e, w.kana || w.kanji); }
@@ -827,7 +884,6 @@
         el.classList.toggle('revealed'); 
     }
 
-    /* LOGIC PHẦN GÕ TỪ */
     let typeCurrent = null;
     
     function resetTypingCounters() {
@@ -877,12 +933,20 @@
                 updateTypingStatsUI();
                 document.getElementById('type-feedback').style.color = 'var(--success)'; 
                 document.getElementById('type-feedback').innerText = 'Chính xác! 🎉'; 
+                
+                // Thêm vào đầu danh sách lịch sử (Đúng)
+                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: v, status: 'Đúng', color: 'var(--success)' });
+
                 setTimeout(loadNextType, 800); 
             } else { 
                 typingStats.wrong += 1;
                 updateTypingStatsUI();
                 document.getElementById('type-feedback').style.color = 'var(--error)'; 
                 document.getElementById('type-feedback').innerText = `Sai rồi! Đáp án: ${typeCurrent.kana}`; 
+                
+                // Thêm vào đầu danh sách lịch sử (Sai)
+                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: v, status: 'Sai', color: 'var(--error)' });
+
                 setTimeout(loadNextType, 1800); 
             } 
         } 
@@ -897,7 +961,43 @@
         document.getElementById('type-feedback').style.color = 'var(--text-muted)';
         document.getElementById('type-feedback').innerText = `Đáp án đúng: ${typeCurrent.kana}`;
         document.getElementById('type-input').disabled = true;
+        
+        // Thêm vào đầu danh sách lịch sử (Bỏ qua)
+        typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: '(Bỏ qua)', status: 'Qua', color: 'var(--warning)' });
+
         setTimeout(loadNextType, 1200);
+    }
+
+    /* Các hàm điều khiển Modal Lịch sử Gõ từ */
+    function openTypingHistory() {
+        const tbody = document.getElementById('type-history-tbody');
+        tbody.innerHTML = '';
+        if (typeHistoryList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Chưa có dữ liệu gõ trong phiên này</td></tr>';
+        } else {
+            typeHistoryList.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">
+                            <strong>${item.word}</strong><br>
+                            <small style="color:var(--text-muted)">${item.kana}</small>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">${item.input}</td>
+                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color); color: ${item.color}; font-weight: bold;">${item.status}</td>
+                    </tr>
+                `;
+            });
+        }
+        document.getElementById('typing-history-modal').style.display = 'flex';
+    }
+
+    function closeTypingHistory() {
+        document.getElementById('typing-history-modal').style.display = 'none';
+    }
+
+    function clearTypingHistory() {
+        typeHistoryList = [];
+        openTypingHistory();
     }
 
     function renderManagerList() {
