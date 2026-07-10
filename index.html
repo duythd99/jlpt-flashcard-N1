@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Flashcard JLPT N1 🌸</title>
     
-    <link class="manifest" href="manifest.json">
-    <link class="apple-touch-icon" href="icon.png">
+    <!-- SỬA LỖI HIỂN THỊ VÀ CẤU HÌNH PWA CHUẨN TRÊN ĐIỆN THOẠI -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="N1 Flashcard">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -382,7 +384,6 @@
                 <span id="type-hint" class="quiz-hint-text">-</span>
             </div>
             
-            <!-- ĐÃ CẬP NHẬT: Thay đổi sang autocomplete="off" để triệt tiêu hoàn toàn thanh gợi ý lịch sử tìm kiếm của trình duyệt -->
             <input type="text" id="type-input" class="game-input" placeholder="Nhập cách đọc Hiragana/Kana..." onkeydown="checkTyping(event)" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
             
             <div class="type-actions">
@@ -491,9 +492,9 @@
 
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
         "N1_Mondai_Demo": [
-            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
-            { kanji: "圧倒적", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強 sựで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
-            { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false }
+            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm rất chắc chắn.", synonym: "", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
+            { kanji: "圧倒的", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒적인强 sựで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
+            { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 }
         ]
     };
     let currentList = [], activeWordIndex = 0, currentSheetName = "";
@@ -620,7 +621,8 @@
                                 exampleJp: cellD && cellD.v !== undefined ? String(cellD.v).trim() : "",
                                 exampleVi: cellE && cellE.v !== undefined ? String(cellE.v).trim() : "",
                                 synonym: cellF && cellF.v !== undefined ? String(cellF.v).trim() : "",
-                                hanviet: hv, flipCount: 0, starred: false
+                                hanviet: hv, flipCount: 0, starred: false,
+                                interval: 0, ease: 2.5, nextReview: 0
                             });
                         } else { emptyStreak++; }
                         rowIndex++;
@@ -645,7 +647,13 @@
         const searchInput = document.getElementById('vocab-search-input');
         if(searchInput) searchInput.value = '';
 
-        currentList = (db[currentSheetName] || []).map(w => { w.hanviet = autoTranslateHanViet(w.kanji); return w; });
+        currentList = (db[currentSheetName] || []).map(w => { 
+            w.hanviet = autoTranslateHanViet(w.kanji); 
+            if (w.interval === undefined) w.interval = 0;
+            if (w.ease === undefined) w.ease = 2.5;
+            if (w.nextReview === undefined) w.nextReview = 0;
+            return w; 
+        });
         activeWordIndex = 0; updateFlashcard(); resetTypingCounters();
         if(document.getElementById('tab-manager').style.display === 'flex') { renderManagerList(); }
     }
@@ -744,9 +752,34 @@
         } else { window.open(webUrl, '_blank'); }
     }
 
+    /* BỔ SUNG LOGIC THUẬT TOÁN SPACED REPETITION (SM-2 ĐÃ TỐI ƯU GIAO DIỆN) */
     function handleDifficulty(level, event) {
         if(event) event.stopPropagation();
         if(currentList.length === 0) return;
+        
+        const word = currentList[activeWordIndex];
+        const now = Date.now();
+        
+        // Đặt mặc định nếu chưa có dữ liệu tần suất
+        if (!word.interval) word.interval = 0;
+        if (!word.ease) word.ease = 2.5;
+
+        if (level === 'again') {
+            word.interval = 1; // Học lại: xem lại sau 1 phút
+            word.ease = Math.max(1.3, word.ease - 0.2);
+        } else if (level === 'hard') {
+            word.interval = word.interval === 0 ? 3 : Math.round(word.interval * 1.2); // Khó: Tăng chậm
+            word.ease = Math.max(1.3, word.ease - 0.15);
+        } else if (level === 'good') {
+            word.interval = word.interval === 0 ? 10 : Math.round(word.interval * word.ease); // Tốt: Tăng chuẩn theo hệ số
+        } else if (level === 'easy') {
+            word.interval = word.interval === 0 ? 30 : Math.round(word.interval * word.ease * 1.5); // Dễ: Giãn cách cực nhanh
+            word.ease += 0.15;
+        }
+
+        word.nextReview = now + word.interval * 60 * 1000; // Quy đổi phút ra mili-giây
+        saveToLocalStorage();
+        
         nextCard();
     }
 
