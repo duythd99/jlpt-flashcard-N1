@@ -96,7 +96,6 @@
             user-select: none;
             transition: color 0.2s;
         }
-        /* Đặt nút sáng/tối và offline cạnh nhau */
         #theme-toggle { right: 0; }
         #offline-toggle { right: 38px; font-size: 19px;}
 
@@ -181,7 +180,6 @@
 
         mark.highlight-word { background-color: var(--highlight-bg); color: var(--highlight-text); font-weight: bold; padding: 0 4px; border-radius: 4px; }
 
-        /* Cân đối thiết kế Nav Buttons theo image_c59659.png */
         .nav-buttons { display: flex; justify-content: space-between; align-items: stretch; width: 100%; gap: 10px; margin-top: 4px; }
         .nav-btn { padding: 14px 4px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 15px; border: 1.5px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         
@@ -189,17 +187,14 @@
         .nav-btn.btn-prev:active { background-color: rgba(127,182,155,0.05); }
         
         .nav-btn.btn-secondary { flex: 0.8; background-color: var(--secondary); color: #1F2937; }
-        :root[data-theme="dark"] .nav-btn.btn-secondary { color: #1F2937; }
         
         .nav-btn.btn-next { flex: 1.1; background-color: var(--primary); color: #1F2937; }
-        :root[data-theme="dark"] .nav-btn.btn-next { color: #1F2937; }
 
         .progress-container { width: 100%; display: flex; flex-direction: column; gap: 4px; margin: 2px 0; }
         .progress-bar-bg { width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; background-color: var(--success); transition: width 0.3s ease; }
         .progress-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); }
 
-        /* Cân đối nút Độ khó và Icon */
         .difficulty-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin: 8px 0; }
         .diff-btn { background-color: transparent; border: 1.5px solid; padding: 10px 4px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: transform 0.1s, background-color 0.2s; }
         .diff-btn:active { transform: scale(0.96); }
@@ -264,16 +259,13 @@
         
         .modal-action-btn { background-color: transparent; border: 1.5px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
         .modal-action-btn:hover { background-color: var(--primary); color: white; }
-        :root[data-theme="dark"] .modal-action-btn:hover { color: #1F2937; }
     </style>
 </head>
 <body>
 
 <div class="header-row">
     <h1 class="title">Flashcard JLPT N1 🌸</h1>
-    <!-- Nút Bật/Tắt Chế độ Offline -->
     <button id="offline-toggle" class="theme-toggle-btn" onclick="toggleOffline()" title="Bật/Tắt chế độ Offline">📶</button>
-    <!-- Nút Bật/Tắt Chế độ Sáng/Tối -->
     <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Sáng/Tối">☀️</button>
 </div>
 
@@ -390,11 +382,11 @@
                 <span id="type-hint" class="quiz-hint-text">-</span>
             </div>
             
-            <input type="text" id="type-input" class="game-input" placeholder="Nhập cách đọc Hiragana/Kana..." onkeypress="checkTyping(event)">
+            <!-- ĐÃ CẬP NHẬT: Thay đổi sang autocomplete="off" để triệt tiêu hoàn toàn thanh gợi ý lịch sử tìm kiếm của trình duyệt -->
+            <input type="text" id="type-input" class="game-input" placeholder="Nhập cách đọc Hiragana/Kana..." onkeydown="checkTyping(event)" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
             
             <div class="type-actions">
                 <button id="type-skip-btn" class="mode-btn" style="width: 100%; padding: 14px; border-radius: 14px;" onclick="skipTyping()">Bỏ qua / Câu khác</button>
-                <!-- Nút Lịch sử gõ mới theo yêu cầu ảnh image_c58eb4.png -->
                 <button class="mode-btn" style="width: 100%; padding: 14px; border-radius: 14px; margin-top: 4px;" onclick="openTypingHistory()">📝 Xem lịch sử gõ</button>
             </div>
             <p id="type-feedback" style="text-align:center; font-weight:bold; font-size:14px; height:20px; margin: 0;"></p>
@@ -427,7 +419,7 @@
     </div>
 </div>
 
-<!-- Modal Từ Vựng (Giữ nguyên) -->
+<!-- Modal Từ Vựng -->
 <div id="kanji-popup" class="modal-overlay" onclick="closeKanjiPopup()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeKanjiPopup()">&times;</span>
@@ -444,7 +436,7 @@
     </div>
 </div>
 
-<!-- Modal Lịch sử Gõ từ MỚI -->
+<!-- Modal Lịch sử Gõ từ -->
 <div id="typing-history-modal" class="modal-overlay" onclick="closeTypingHistory()">
     <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh; display: flex; flex-direction: column; width: 90%; max-width: 400px; padding: 20px;">
         <span class="modal-close" onclick="closeTypingHistory()">&times;</span>
@@ -477,7 +469,6 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
     })();
 
-    // Biến trạng thái Offline
     let isOfflineMode = false;
 
     function unlockAudio() {
@@ -500,16 +491,14 @@
 
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
         "N1_Mondai_Demo": [
-            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚 là頑丈に作られている。", exampleVi: "Cái kệ này được làm (chế tạo) rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
-            { kanji: "圧倒적", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強さで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
+            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm rất chắc chắn.", synonym: "", flipCount: 0, starred: false },
+            { kanji: "圧倒적", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な強 sựで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false },
             { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false }
         ]
     };
     let currentList = [], activeWordIndex = 0, currentSheetName = "";
-    
     let typingStats = { correct: 0, wrong: 0, total: 0 };
-    let typeHistoryList = []; // Mảng chứa lịch sử gõ từ
-    
+    let typeHistoryList = []; 
     let currentUtterance = null; 
 
     window.onload = () => { 
@@ -530,7 +519,6 @@
         document.getElementById('theme-toggle').innerText = currentTheme === 'light' ? '🌙' : '☀️';
     }
 
-    // Nút Bật/Tắt Offline
     function toggleOffline() {
         isOfflineMode = !isOfflineMode;
         const iconBtn = document.getElementById('offline-toggle');
@@ -544,7 +532,6 @@
         }
     }
 
-    // Chặn click Link ra ngoài khi bật Offline
     function handleExternalLink(e) {
         if(isOfflineMode) {
             e.preventDefault();
@@ -728,83 +715,38 @@
 
     async function openMaziiApp(e) {
         if(e) e.stopPropagation();
-        
-        if (isOfflineMode) {
-            alert("Bạn đang ở chế độ Offline 📴.\nKhông thể dùng kết nối Internet để tra từ điển Mazii!");
-            return;
-        }
-
+        if (isOfflineMode) { alert("Bạn đang ở chế độ Offline 📴."); return; }
         if(currentList.length === 0) return;
         const word = currentList[activeWordIndex];
         const text = word.kanji;
-
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(text);
-            }
-        } catch (err) { 
-            console.log("Clipboard error:", err); 
-        }
-
+        try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); } } catch (err) { }
         const keyword = encodeURIComponent(text);
         const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
         const appUrl = `mazii://search/${keyword}`;
-        
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            const startTime = Date.now();
-            window.location.href = appUrl;
-            
-            setTimeout(() => {
-                if (Date.now() - startTime < 800) {
-                    window.location.href = webUrl;
-                }
-            }, 500);
-        } else {
-            window.open(webUrl, '_blank');
-        }
+            const startTime = Date.now(); window.location.href = appUrl;
+            setTimeout(() => { if (Date.now() - startTime < 800) { window.location.href = webUrl; } }, 500);
+        } else { window.open(webUrl, '_blank'); }
     }
 
     async function openMaziiFromPopup(e) {
         if(e) e.stopPropagation();
-
-        if (isOfflineMode) {
-            alert("Bạn đang ở chế độ Offline 📴.\nKhông thể dùng kết nối Internet để tra từ điển Mazii!");
-            return;
-        }
-
+        if (isOfflineMode) { alert("Bạn đang ở chế độ Offline 📴."); return; }
         const kanjiText = document.getElementById('modal-kanji-text').innerText;
         if(!kanjiText || kanjiText === '-') return;
-
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(kanjiText);
-            }
-        } catch (err) { 
-            console.log("Clipboard error:", err); 
-        }
-
+        try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(kanjiText); } } catch (err) { }
         const keyword = encodeURIComponent(kanjiText);
         const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
         const appUrl = `mazii://search/${keyword}`;
-        
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            const startTime = Date.now();
-            window.location.href = appUrl;
-            
-            setTimeout(() => {
-                if (Date.now() - startTime < 800) {
-                    window.location.href = webUrl;
-                }
-            }, 500);
-        } else {
-            window.open(webUrl, '_blank');
-        }
+            const startTime = Date.now(); window.location.href = appUrl;
+            setTimeout(() => { if (Date.now() - startTime < 800) { window.location.href = webUrl; } }, 500);
+        } else { window.open(webUrl, '_blank'); }
     }
 
     function handleDifficulty(level, event) {
         if(event) event.stopPropagation();
         if(currentList.length === 0) return;
-        console.log(`Từ [${currentList[activeWordIndex].kanji}] mức độ: ${level}`);
         nextCard();
     }
 
@@ -834,64 +776,35 @@
         const full = db[currentSheetName] || [];
         currentList = document.getElementById('only-bookmarked').checked ? full.filter(w => w.starred) : [...full];
         if(currentList.length === 0) { alert("Chưa có thẻ đánh dấu!"); document.getElementById('only-bookmarked').checked = false; currentList = [...full]; }
-        
         const searchInput = document.getElementById('vocab-search-input');
         if(searchInput) searchInput.value = '';
-
-        activeWordIndex = 0; 
-        updateFlashcard();
-        filterManagerList(); 
+        activeWordIndex = 0; updateFlashcard(); filterManagerList(); 
     }
 
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
-        
-        if (isOfflineMode) {
-            alert("Đang ở chế độ Offline 📴.\nPhát âm thanh bị vô hiệu hóa để bảo vệ Data di động của bạn.");
-            return;
-        }
-
+        if (isOfflineMode) { alert("Đang ở chế độ Offline 📴."); return; }
         if(!text) return;
-
-        try { window.speechSynthesis.cancel(); } catch(err) { console.log(err); }
-        
+        try { window.speechSynthesis.cancel(); } catch(err) { }
         const cleanText = text.replace(/<[^>]*>/g, ''); 
         currentUtterance = new SpeechSynthesisUtterance(cleanText); 
-        currentUtterance.lang = 'ja-JP'; 
-        currentUtterance.rate = 0.95; 
-        
+        currentUtterance.lang = 'ja-JP'; currentUtterance.rate = 0.95; 
         if (window.speechSynthesis.getVoices) {
             const voices = window.speechSynthesis.getVoices();
             let premiumVoice = voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('siri')) ||
                                voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('premium')) ||
-                               voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('kyoko')) ||
-                               voices.find(v => v.lang.startsWith('ja') && v.name.toLowerCase().includes('otoya')) ||
                                voices.find(v => v.lang.startsWith('ja'));
-            
-            if (premiumVoice) {
-                currentUtterance.voice = premiumVoice;
-            }
+            if (premiumVoice) currentUtterance.voice = premiumVoice;
         }
-        
         setTimeout(() => { window.speechSynthesis.speak(currentUtterance); }, 50);
     }
     
     function speakCurrentWord(e) { const w = currentList[activeWordIndex]; speakJapaneseText(e, w.kana || w.kanji); }
     function speakCurrentExample(e) { speakJapaneseText(e, currentList[activeWordIndex].exampleJp); }
-    
-    function revealBlur(e, el) { 
-        if(e) e.stopPropagation(); 
-        el.classList.toggle('revealed'); 
-    }
+    function revealBlur(e, el) { if(e) e.stopPropagation(); el.classList.toggle('revealed'); }
 
     let typeCurrent = null;
-    
-    function resetTypingCounters() {
-        typingStats = { correct: 0, wrong: 0, total: 0 };
-        updateTypingStatsUI();
-        loadNextType();
-    }
-
+    function resetTypingCounters() { typingStats = { correct: 0, wrong: 0, total: 0 }; updateTypingStatsUI(); loadNextType(); }
     function updateTypingStatsUI() {
         document.getElementById('type-correct-count').innerText = typingStats.correct;
         document.getElementById('type-wrong-count').innerText = typingStats.wrong;
@@ -903,50 +816,36 @@
         let kanjiOnlyList = currentList.filter(w => /[\u4e00-\u9faf]/.test(w.kanji));
         if (kanjiOnlyList.length === 0) kanjiOnlyList = currentList;
         if (kanjiOnlyList.length === 0) {
-            document.getElementById('type-q').innerText = "Trống";
-            document.getElementById('type-hint').innerText = "-";
-            return;
+            document.getElementById('type-q').innerText = "Trống"; document.getElementById('type-hint').innerText = "-"; return;
         }
-        
         typeCurrent = kanjiOnlyList[Math.floor(Math.random() * kanjiOnlyList.length)]; 
         document.getElementById('type-q').innerText = typeCurrent.kanji; 
         document.getElementById('type-hint').innerText = typeCurrent.meaning;
-        
-        const i = document.getElementById('type-input'); 
-        i.value = ''; 
-        i.disabled = false; 
-        document.getElementById('type-feedback').innerText = ''; 
-        i.focus(); 
+        const i = document.getElementById('type-input'); i.value = ''; i.disabled = false; 
+        document.getElementById('type-feedback').innerText = ''; i.focus(); 
     }
     
     function checkTyping(e) { 
-        if (e.key === 'Enter') { 
+        if (e.key === 'Enter' || e.keyCode === 13) { 
             const i = document.getElementById('type-input'); 
             const v = i.value.trim().toLowerCase(); 
             if (!v) return;
             
+            e.preventDefault(); 
             i.disabled = true; 
             typingStats.total += 1;
 
             if (v === typeCurrent.kana.toLowerCase()) { 
-                typingStats.correct += 1;
-                updateTypingStatsUI();
+                typingStats.correct += 1; updateTypingStatsUI();
                 document.getElementById('type-feedback').style.color = 'var(--success)'; 
                 document.getElementById('type-feedback').innerText = 'Chính xác! 🎉'; 
-                
-                // Thêm vào đầu danh sách lịch sử (Đúng)
-                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: v, status: 'Đúng', color: 'var(--success)' });
-
+                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: i.value.trim(), status: 'Đúng', color: 'var(--success)' });
                 setTimeout(loadNextType, 800); 
             } else { 
-                typingStats.wrong += 1;
-                updateTypingStatsUI();
+                typingStats.wrong += 1; updateTypingStatsUI();
                 document.getElementById('type-feedback').style.color = 'var(--error)'; 
                 document.getElementById('type-feedback').innerText = `Sai rồi! Đáp án: ${typeCurrent.kana}`; 
-                
-                // Thêm vào đầu danh sách lịch sử (Sai)
-                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: v, status: 'Sai', color: 'var(--error)' });
-
+                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: i.value.trim(), status: 'Sai', color: 'var(--error)' });
                 setTimeout(loadNextType, 1800); 
             } 
         } 
@@ -954,79 +853,78 @@
 
     function skipTyping() {
         if (!typeCurrent) return;
-        typingStats.total += 1;
-        typingStats.wrong += 1;
-        updateTypingStatsUI();
-
+        typingStats.total += 1; typingStats.wrong += 1; updateTypingStatsUI();
         document.getElementById('type-feedback').style.color = 'var(--text-muted)';
         document.getElementById('type-feedback').innerText = `Đáp án đúng: ${typeCurrent.kana}`;
         document.getElementById('type-input').disabled = true;
-        
-        // Thêm vào đầu danh sách lịch sử (Bỏ qua)
         typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: '(Bỏ qua)', status: 'Qua', color: 'var(--warning)' });
-
         setTimeout(loadNextType, 1200);
     }
 
-    /* Các hàm điều khiển Modal Lịch sử Gõ từ */
+    function renderDiff(input, correct) {
+        if (input === '(Bỏ qua)') return `<span style="color:var(--text-muted); font-style:italic;">${input}</span>`;
+        let html = '', maxLen = Math.max(input.length, correct.length);
+        for (let i = 0; i < maxLen; i++) {
+            let cIn = input[i] || '', cCorr = correct[i] || '';
+            if (cIn.toLowerCase() === cCorr.toLowerCase()) { html += `<span>${cIn}</span>`; } 
+            else if (cIn) { html += `<span style="background-color: rgba(231, 111, 81, 0.25); color: var(--error); font-weight: bold; border-radius: 2px; padding: 0 1px; text-decoration: line-through;">${cIn}</span>`; }
+        }
+        return html;
+    }
+
+    function renderCorrectDiff(input, correct) {
+        if (input === '(Bỏ qua)') return `<span>${correct}</span>`;
+        let html = '', maxLen = Math.max(input.length, correct.length);
+        for (let i = 0; i < maxLen; i++) {
+            let cIn = input[i] || '', cCorr = correct[i] || '';
+            if (cIn.toLowerCase() === cCorr.toLowerCase()) { html += `<span>${cCorr}</span>`; } 
+            else if (cCorr) { html += `<span style="background-color: rgba(116, 198, 157, 0.3); color: var(--success); font-weight: bold; border-radius: 2px; padding: 0 1px;">${cCorr}</span>`; }
+        }
+        return html;
+    }
+
     function openTypingHistory() {
-        const tbody = document.getElementById('type-history-tbody');
-        tbody.innerHTML = '';
+        const tbody = document.getElementById('type-history-tbody'); tbody.innerHTML = '';
         if (typeHistoryList.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Chưa có dữ liệu gõ trong phiên này</td></tr>';
         } else {
             typeHistoryList.forEach(item => {
+                const displayInput = item.status === 'Sai' ? renderDiff(item.input, item.kana) : item.input;
+                const displayCorrectReading = item.status === 'Sai' ? renderCorrectDiff(item.input, item.kana) : item.kana;
                 tbody.innerHTML += `
                     <tr>
                         <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">
-                            <strong>${item.word}</strong><br>
-                            <small style="color:var(--text-muted)">${item.kana}</small>
+                            <strong>${item.word}</strong><br><small style="color:var(--text-muted)">${displayCorrectReading}</small>
                         </td>
-                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">${item.input}</td>
+                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">${displayInput}</td>
                         <td style="padding: 10px; border-bottom: 1px dashed var(--border-color); color: ${item.color}; font-weight: bold;">${item.status}</td>
-                    </tr>
-                `;
+                    </tr>`;
             });
         }
         document.getElementById('typing-history-modal').style.display = 'flex';
     }
 
-    function closeTypingHistory() {
-        document.getElementById('typing-history-modal').style.display = 'none';
-    }
-
-    function clearTypingHistory() {
-        typeHistoryList = [];
-        openTypingHistory();
-    }
+    function closeTypingHistory() { document.getElementById('typing-history-modal').style.display = 'none'; }
+    function clearTypingHistory() { typeHistoryList = []; openTypingHistory(); }
 
     function renderManagerList() {
-        document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`;
-        filterManagerList(); 
+        document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`; filterManagerList(); 
     }
 
     function filterManagerList() {
         const keyword = document.getElementById('vocab-search-input').value.trim().toLowerCase();
-        const tbody = document.getElementById('vocab-list-tbody'); 
-        tbody.innerHTML = '';
-        
+        const tbody = document.getElementById('vocab-list-tbody'); tbody.innerHTML = '';
         const isOnlyBookmarked = document.getElementById('only-bookmarked').checked;
         const fullList = db[currentSheetName] || [];
         const baseDataList = isOnlyBookmarked ? fullList.filter(w => w.starred) : fullList; 
         
         baseDataList.forEach((w, index) => {
-            const kj = (w.kanji || '').toLowerCase();
-            const hv = (w.hanviet || autoTranslateHanViet(w.kanji)).toLowerCase();
-            const mn = (w.meaning || '').toLowerCase();
-            const kn = (w.kana || '').toLowerCase();
-
-            if (keyword && !kj.includes(keyword) && !hv.includes(keyword) && !mn.includes(keyword) && !kn.includes(keyword)) {
-                return; 
-            }
+            const kj = (w.kanji || '').toLowerCase(); const hv = (w.hanviet || autoTranslateHanViet(w.kanji)).toLowerCase();
+            const mn = (w.meaning || '').toLowerCase(); const kn = (w.kana || '').toLowerCase();
+            if (keyword && !kj.includes(keyword) && !hv.includes(keyword) && !mn.includes(keyword) && !kn.includes(keyword)) return; 
 
             let tr = document.createElement('tr');
             const originalIndexInSheet = fullList.findIndex(orig => orig.kanji === w.kanji);
-
             tr.onclick = () => showKanjiPopup(originalIndexInSheet !== -1 ? originalIndexInSheet : index);
             tr.innerHTML = `
                 <td>${originalIndexInSheet !== -1 ? originalIndexInSheet + 2 : index + 2}</td>
@@ -1035,8 +933,7 @@
                 <td style="font-weight: bold; color: var(--primary); text-decoration: underline dotted;">${w.kanji}</td>
                 <td style="color: var(--accent); font-weight: bold; text-transform: uppercase;">${w.hanviet || autoTranslateHanViet(w.kanji)}</td>
                 <td>${w.kana || '---'}</td>
-                <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${w.meaning}</td>
-            `;
+                <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${w.meaning}</td>`;
             tbody.appendChild(tr);
         });
     }
@@ -1044,40 +941,26 @@
     function toggleStarFromList(index) {
         const listData = db[currentSheetName] || [];
         if (listData[index]) {
-            listData[index].starred = !listData[index].starred;
-            saveToLocalStorage();
-            
+            listData[index].starred = !listData[index].starred; saveToLocalStorage();
             const full = db[currentSheetName] || [];
-            if(document.getElementById('only-bookmarked').checked) {
-                currentList = full.filter(w => w.starred);
-            } else {
-                currentList = [...full];
-            }
-            
-            filterManagerList(); 
-            updateFlashcard();
+            currentList = document.getElementById('only-bookmarked').checked ? full.filter(w => w.starred) : [...full];
+            filterManagerList(); updateFlashcard();
         }
     }
 
     function showKanjiPopup(index) {
-        const listData = db[currentSheetName] || [];
-        const word = listData[index]; if (!word) return;
+        const listData = db[currentSheetName] || []; const word = listData[index]; if (!word) return;
         document.getElementById('modal-kanji-text').innerText = word.kanji;
         document.getElementById('modal-hanviet-text').innerText = word.hanviet || autoTranslateHanViet(word.kanji);
         document.getElementById('modal-kana-text').innerText = word.kana ? `[ ${word.kana} ]` : '';
         document.getElementById('modal-meaning-text').innerText = word.meaning;
-        
-        const modalViEl = document.getElementById('modal-example-vi');
-        modalViEl.classList.remove('revealed'); 
+        const modalViEl = document.getElementById('modal-example-vi'); modalViEl.classList.remove('revealed'); 
 
         if (word.exampleJp) {
             document.getElementById('modal-example-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
-            modalViEl.innerText = word.exampleVi || 'Chưa có bản dịch';
-            modalViEl.style.display = 'inline-block';
+            modalViEl.innerText = word.exampleVi || 'Chưa có bản dịch'; modalViEl.style.display = 'inline-block';
         } else {
-            document.getElementById('modal-example-jp').innerText = 'Chưa cập nhật ví dụ.';
-            modalViEl.innerText = '';
-            modalViEl.style.display = 'none';
+            document.getElementById('modal-example-jp').innerText = 'Chưa cập nhật ví dụ.'; modalViEl.innerText = ''; modalViEl.style.display = 'none';
         }
         document.getElementById('kanji-popup').style.display = 'flex';
     }
