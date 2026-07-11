@@ -99,7 +99,8 @@
             transition: color 0.2s;
         }
         #theme-toggle { right: 0; }
-        #offline-toggle { right: 38px; font-size: 19px;}
+        #color-picker-toggle { right: 34px; font-size: 19px; }
+        #offline-toggle { right: 72px; font-size: 19px;}
 
         .container { 
             width: 100%; 
@@ -238,7 +239,7 @@
         .type-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
         .search-box-wrapper { width: 100%; margin-bottom: 8px; box-sizing: border-box; }
-        .search-input { width: 100%; padding: 10px 14px; font-size: 14px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
+        .search-input { width: 100%; padding: 10px 14px; font-size: 14px; background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 10px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
         .search-input:focus { border-color: var(--primary); }
 
         .vocab-table-wrapper { flex: 1; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 16px; background: var(--card-bg); -webkit-overflow-scrolling: touch; margin-bottom: 5px; }
@@ -261,6 +262,18 @@
         
         .modal-action-btn { background-color: transparent; border: 1.5px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
         .modal-action-btn:hover { background-color: var(--primary); color: white; }
+
+        /* CSS MỚI CHO MODAL TÙY CHỈNH BẢNG MÀU */
+        .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; text-align: left; }
+        .color-picker-item { display: flex; flex-direction: column; gap: 5px; }
+        .color-picker-item label { font-size: 13px; font-weight: bold; color: var(--text-color); }
+        .color-input-wrapper { display: flex; align-items: center; width: 100%; height: 40px; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; background: var(--bg-color); }
+        .color-input-wrapper input[type="color"] { border: none; width: 100%; height: 100%; padding: 0; background: transparent; cursor: pointer; }
+        .color-modal-footer { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+        .color-modal-btn { flex: 1; padding: 12px; border-radius: 14px; font-weight: bold; font-size: 14px; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
+        .btn-restore { background: transparent; border-color: var(--border-color); color: var(--text-color); }
+        .btn-done { background: var(--primary); color: #1F2937; }
+        :root[data-theme="dark"] .btn-done { color: #1F2937; }
     </style>
 </head>
 <body>
@@ -268,6 +281,7 @@
 <div class="header-row">
     <h1 class="title">Flashcard JLPT N1 🌸</h1>
     <button id="offline-toggle" class="theme-toggle-btn" onclick="toggleOffline()" title="Bật/Tắt chế độ Offline">📶</button>
+    <button id="color-picker-toggle" class="theme-toggle-btn" onclick="openColorModal()" title="Tùy chỉnh màu sắc">🎨</button>
     <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Sáng/Tối">☀️</button>
 </div>
 
@@ -397,7 +411,7 @@
     <!-- TAB DANH SÁCH -->
     <div id="tab-manager" class="tab-content" style="display: none;">
         <div class="search-box-wrapper">
-            <input type="text" id="vocab-search-input" class="search-input" placeholder="🔍 Nhập Kanji, Hán Việt hoặc Ý nghĩa để tra từ..." oninput="filterManagerList()">
+            <input type="text" id="vocab-search-input" class="search-input" placeholder="🔍 Tra toàn bộ bài học (Kanji, Hán Việt, Ý nghĩa)..." oninput="filterManagerList()">
         </div>
 
         <h3 id="manager-title" style="margin:2px 0 6px 0; font-size:14px; color:var(--primary);">Danh sách</h3>
@@ -405,7 +419,7 @@
             <table class="vocab-table">
                 <thead>
                     <tr>
-                        <th>Dòng</th>
+                        <th style="line-height:1.2; text-align:center; min-width: 60px;">STT</th>
                         <th>⭐</th>
                         <th>👁️</th>
                         <th>Từ vựng</th>
@@ -416,6 +430,47 @@
                 </thead>
                 <tbody id="vocab-list-tbody"></tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tùy Chỉnh Màu Sắc -->
+<div id="color-custom-modal" class="modal-overlay" onclick="closeColorModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeColorModal()">&times;</span>
+        <h3 style="margin-top:0; color:var(--primary); font-size:20px;" id="color-modal-title">Tùy chỉnh bảng màu</h3>
+        <p id="color-modal-subtitle" style="font-size:12px; color:var(--text-muted); margin:-8px 0 10px 0;">Đang sửa cấu hình giao diện: SÁNG</p>
+        
+        <div class="color-picker-grid">
+            <div class="color-picker-item">
+                <label>Màu Nền:</label>
+                <div class="color-input-wrapper"><input type="color" id="cp-bg-color" oninput="applyLiveColor('--bg-color', this.value)"></div>
+            </div>
+            <div class="color-picker-item">
+                <label>Nền Thẻ Card:</label>
+                <div class="color-input-wrapper"><input type="color" id="cp-card-bg" oninput="applyLiveColor('--card-bg', this.value)"></div>
+            </div>
+            <div class="color-picker-item">
+                <label>Màu Chủ Đạo:</label>
+                <div class="color-input-wrapper"><input type="color" id="cp-primary" oninput="applyLiveColor('--primary', this.value)"></div>
+            </div>
+            <div class="color-picker-item">
+                <label>Màu Phụ:</label>
+                <div class="color-input-wrapper"><input type="color" id="cp-secondary" oninput="applyLiveColor('--secondary', this.value)"></div>
+            </div>
+            <div class="color-picker-item">
+                <label>Điểm Nhấn:</label>
+                <div class="color-input-wrapper"><input type="color" id="cp-accent" oninput="applyLiveColor('--accent', this.value)"></div>
+            </div>
+            <div class="color-picker-item">
+                <label>Màu Chữ:</label>
+                <div class="color-input-wrapper"><input type="color" id="cp-text-color" oninput="applyLiveColor('--text-color', this.value)"></div>
+            </div>
+        </div>
+
+        <div class="color-modal-footer">
+            <button class="color-modal-btn btn-restore" onclick="resetToDefaultColors()">Khôi phục chuẩn</button>
+            <button class="color-modal-btn btn-done" onclick="saveCustomColors()">Hoàn tất</button>
         </div>
     </div>
 </div>
@@ -465,9 +520,38 @@
         });
     }
 
+    // KHAI BÁO BẢNG MÀU MẶC ĐỊNH GỐC ĐỂ KHÔI PHỤC KHI CẦN
+    const DEFAULT_THEME_COLORS = {
+        light: {
+            '--bg-color': '#F8FAF8', '--card-bg': '#FFFFFF', '--primary': '#7FB69B',
+            '--secondary': '#A8DADC', '--accent': '#F4A261', '--text-color': '#2D3436'
+        },
+        dark: {
+            '--bg-color': '#1F2937', '--card-bg': '#2D3748', '--primary': '#9FD3C7',
+            '--secondary': '#8ECAE6', '--accent': '#F6BD60', '--text-color': '#F8F9FA'
+        }
+    };
+
+    // Tải cấu hình màu từ LocalStorage hoặc dùng màu mặc định gốc
+    function loadSavedColors() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const savedCustom = localStorage.getItem(`custom_colors_${currentTheme}`);
+        if (savedCustom) {
+            const colors = JSON.parse(savedCustom);
+            for (const [key, value] of Object.entries(colors)) {
+                document.documentElement.style.setProperty(key, value);
+            }
+        } else {
+            // Xóa style inline nếu không cấu hình tùy chỉnh để sử dụng CSS gốc mặc định
+            const targets = ['--bg-color', '--card-bg', '--primary', '--secondary', '--accent', '--text-color'];
+            targets.forEach(t => document.documentElement.style.removeProperty(t));
+        }
+    }
+
     (function() {
         const savedTheme = localStorage.getItem('app_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
+        loadSavedColors();
     })();
 
     let isOfflineMode = false;
@@ -493,7 +577,7 @@
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
         "N1_Mondai_Demo": [
             { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm rất chắc chắn.", synonym: "", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
-            { kanji: "圧倒的", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒적인强 sựで優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
+            { kanji: "圧倒的", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒적인强 sự cho 優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
             { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 }
         ]
     };
@@ -513,6 +597,7 @@
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('app_theme', newTheme);
         updateThemeToggleIcon();
+        loadSavedColors(); // Load lại màu sắc tương ứng với theme vừa chuyển đổi
     }
 
     function updateThemeToggleIcon() {
@@ -752,7 +837,6 @@
         } else { window.open(webUrl, '_blank'); }
     }
 
-    /* BỔ SUNG LOGIC THUẬT TOÁN SPACED REPETITION (SM-2 ĐÃ TỐI ƯU GIAO DIỆN) */
     function handleDifficulty(level, event) {
         if(event) event.stopPropagation();
         if(currentList.length === 0) return;
@@ -760,24 +844,23 @@
         const word = currentList[activeWordIndex];
         const now = Date.now();
         
-        // Đặt mặc định nếu chưa có dữ liệu tần suất
         if (!word.interval) word.interval = 0;
         if (!word.ease) word.ease = 2.5;
 
         if (level === 'again') {
-            word.interval = 1; // Học lại: xem lại sau 1 phút
+            word.interval = 1; 
             word.ease = Math.max(1.3, word.ease - 0.2);
         } else if (level === 'hard') {
-            word.interval = word.interval === 0 ? 3 : Math.round(word.interval * 1.2); // Khó: Tăng chậm
+            word.interval = word.interval === 0 ? 3 : Math.round(word.interval * 1.2); 
             word.ease = Math.max(1.3, word.ease - 0.15);
         } else if (level === 'good') {
-            word.interval = word.interval === 0 ? 10 : Math.round(word.interval * word.ease); // Tốt: Tăng chuẩn theo hệ số
+            word.interval = word.interval === 0 ? 10 : Math.round(word.interval * word.ease); 
         } else if (level === 'easy') {
-            word.interval = word.interval === 0 ? 30 : Math.round(word.interval * word.ease * 1.5); // Dễ: Giãn cách cực nhanh
+            word.interval = word.interval === 0 ? 30 : Math.round(word.interval * word.ease * 1.5); 
             word.ease += 0.15;
         }
 
-        word.nextReview = now + word.interval * 60 * 1000; // Quy đổi phút ra mili-giây
+        word.nextReview = now + word.interval * 60 * 1000; 
         saveToLocalStorage();
         
         nextCard();
@@ -926,11 +1009,11 @@
                 const displayCorrectReading = item.status === 'Sai' ? renderCorrectDiff(item.input, item.kana) : item.kana;
                 tbody.innerHTML += `
                     <tr>
-                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">
+                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
                             <strong>${item.word}</strong><br><small style="color:var(--text-muted)">${displayCorrectReading}</small>
                         </td>
-                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color);">${displayInput}</td>
-                        <td style="padding: 10px; border-bottom: 1px dashed var(--border-color); color: ${item.color}; font-weight: bold;">${item.status}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${displayInput}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); color: ${item.color}; font-weight: bold;">${item.status}</td>
                     </tr>`;
             });
         }
@@ -941,34 +1024,116 @@
     function clearTypingHistory() { typeHistoryList = []; openTypingHistory(); }
 
     function renderManagerList() {
-        document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`; filterManagerList(); 
+        const keyword = document.getElementById('vocab-search-input').value.trim();
+        if (keyword) {
+            document.getElementById('manager-title').innerText = `Kết quả tìm kiếm cho: "${keyword}"`;
+        } else {
+            document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`;
+        }
+        filterManagerList(); 
     }
 
+    /* ĐÃ SỬA: ĐỔI TÊN THÀNH STT, CHỈ HIỆN SỐ KHI KHÔNG TRA, HIỆN 1 DÒNG NGANG */
     function filterManagerList() {
         const keyword = document.getElementById('vocab-search-input').value.trim().toLowerCase();
         const tbody = document.getElementById('vocab-list-tbody'); tbody.innerHTML = '';
         const isOnlyBookmarked = document.getElementById('only-bookmarked').checked;
-        const fullList = db[currentSheetName] || [];
-        const baseDataList = isOnlyBookmarked ? fullList.filter(w => w.starred) : fullList; 
         
-        baseDataList.forEach((w, index) => {
-            const kj = (w.kanji || '').toLowerCase(); const hv = (w.hanviet || autoTranslateHanViet(w.kanji)).toLowerCase();
-            const mn = (w.meaning || '').toLowerCase(); const kn = (w.kana || '').toLowerCase();
+        let searchPool = [];
+        
+        if (keyword) {
+            for (const sheetName in db) {
+                if (sheetName === '_amHanViet') continue;
+                db[sheetName].forEach((w, index) => {
+                    searchPool.push({ ...w, originSheet: sheetName, lineIndex: index + 2 });
+                });
+            }
+        } else {
+            const fullList = db[currentSheetName] || [];
+            fullList.forEach((w, index) => {
+                searchPool.push({ ...w, originSheet: currentSheetName, lineIndex: index + 2 });
+            });
+        }
+
+        if (isOnlyBookmarked) {
+            searchPool = searchPool.filter(w => w.starred);
+        }
+
+        let hasResults = false;
+
+        searchPool.forEach((w) => {
+            const kj = (w.kanji || '').toLowerCase(); 
+            const hv = (w.hanviet || autoTranslateHanViet(w.kanji)).toLowerCase();
+            const mn = (w.meaning || '').toLowerCase(); 
+            const kn = (w.kana || '').toLowerCase();
+            
             if (keyword && !kj.includes(keyword) && !hv.includes(keyword) && !mn.includes(keyword) && !kn.includes(keyword)) return; 
 
+            hasResults = true;
             let tr = document.createElement('tr');
-            const originalIndexInSheet = fullList.findIndex(orig => orig.kanji === w.kanji);
-            tr.onclick = () => showKanjiPopup(originalIndexInSheet !== -1 ? originalIndexInSheet : index);
+            
+            tr.onclick = () => {
+                const sheetData = db[w.originSheet] || [];
+                const actualIdx = sheetData.findIndex(orig => orig.kanji === w.kanji);
+                if (actualIdx !== -1) {
+                    const oldSheet = currentSheetName;
+                    currentSheetName = w.originSheet;
+                    showKanjiPopup(actualIdx);
+                    currentSheetName = oldSheet;
+                }
+            };
+
+            // Phần xử lý hiển thị có tra cứu hay không theo đúng yêu cầu
+            let sttContent = '';
+            if (keyword) {
+                // Có tra từ khóa: Hiện tên bài học và "Dòng X" dọc nhau
+                sttContent = `
+                    <span style="display:block; font-size:10px; font-weight:normal; color:#4a90e2;">${w.originSheet}</span>
+                    <span style="display:block; font-weight:600; font-size:13px;">Dòng ${w.lineIndex}</span>
+                `;
+            } else {
+                // Không tra: Chỉ hiện duy nhất số thứ tự dòng giống ảnh 1
+                sttContent = `<span style="font-weight:600; font-size:14px; color:var(--text-color);">${w.lineIndex}</span>`;
+            }
+
             tr.innerHTML = `
-                <td>${originalIndexInSheet !== -1 ? originalIndexInSheet + 2 : index + 2}</td>
-                <td onclick="event.stopPropagation(); toggleStarFromList(${originalIndexInSheet !== -1 ? originalIndexInSheet : index})">${w.starred ? '⭐' : '☆'}</td>
+                <td style="text-align: center; color: var(--text-muted); line-height: 1.3; padding: 10px 6px;">
+                    ${sttContent}
+                </td>
+                <td onclick="event.stopPropagation(); toggleStarFromGlobalList('${w.originSheet}', '${w.kanji}')">${w.starred ? '⭐' : '☆'}</td>
                 <td>${w.flipCount || 0}</td>
                 <td style="font-weight: bold; color: var(--primary); text-decoration: underline dotted;">${w.kanji}</td>
                 <td style="color: var(--accent); font-weight: bold; text-transform: uppercase;">${w.hanviet || autoTranslateHanViet(w.kanji)}</td>
                 <td>${w.kana || '---'}</td>
-                <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${w.meaning}</td>`;
+                <td>${w.meaning}</td>`;
             tbody.appendChild(tr);
         });
+
+        if (!hasResults) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 30px; color: var(--text-muted);">Không tìm thấy từ vựng tương ứng</td></tr>`;
+        }
+        
+        if (keyword) {
+            document.getElementById('manager-title').innerText = `Tìm kiếm toàn bộ: Tra thấy kết quả tương ứng`;
+        } else {
+            document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`;
+        }
+    }
+
+    function toggleStarFromGlobalList(sheetName, kanjiKey) {
+        const listData = db[sheetName] || [];
+        const idx = listData.findIndex(w => w.kanji === kanjiKey);
+        if (idx !== -1) {
+            listData[idx].starred = !listData[idx].starred;
+            saveToLocalStorage();
+            
+            if (sheetName === currentSheetName) {
+                const full = db[currentSheetName] || [];
+                currentList = document.getElementById('only-bookmarked').checked ? full.filter(w => w.starred) : [...full];
+                updateStarUI();
+            }
+            filterManagerList();
+        }
     }
 
     function toggleStarFromList(index) {
@@ -999,6 +1164,76 @@
     }
 
     function closeKanjiPopup() { document.getElementById('kanji-popup').style.display = 'none'; }
+
+    function getComputedVariable(varName) {
+        return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    }
+
+    function rgbOrHexToHex(colorStr) {
+        if (!colorStr) return '#ffffff';
+        if (colorStr.startsWith('#')) {
+            if (colorStr.length === 4) {
+                return '#' + colorStr[1] + colorStr[1] + colorStr[2] + colorStr[2] + colorStr[3] + colorStr[3];
+            }
+            return colorStr;
+        }
+        return colorStr;
+    }
+
+    function openColorModal() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        document.getElementById('color-modal-subtitle').innerText = `Đang sửa cấu hình giao diện: ${currentTheme === 'light' ? 'SÁNG (Light)' : 'TỐI (Dark)'}`;
+        
+        document.getElementById('cp-bg-color').value = rgbOrHexToHex(getComputedVariable('--bg-color'));
+        document.getElementById('cp-card-bg').value = rgbOrHexToHex(getComputedVariable('--card-bg'));
+        document.getElementById('cp-primary').value = rgbOrHexToHex(getComputedVariable('--primary'));
+        document.getElementById('cp-secondary').value = rgbOrHexToHex(getComputedVariable('--secondary'));
+        document.getElementById('cp-accent').value = rgbOrHexToHex(getComputedVariable('--accent'));
+        document.getElementById('cp-text-color').value = rgbOrHexToHex(getComputedVariable('--text-color'));
+
+        document.getElementById('color-custom-modal').style.display = 'flex';
+    }
+
+    // Đóng Modal cài đặt màu sắc
+    function closeColorModal() {
+        document.getElementById('color-custom-modal').style.display = 'none';
+    }
+
+    // Áp dụng màu trực tiếp (Live preview) khi người dùng kéo thanh màu
+    function applyLiveColor(varName, val) {
+        document.documentElement.style.setProperty(varName, val);
+    }
+
+    // Lưu bảng màu tùy chỉnh vào LocalStorage
+    function saveCustomColors() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const colorConfig = {
+            '--bg-color': document.getElementById('cp-bg-color').value,
+            '--card-bg': document.getElementById('cp-card-bg').value,
+            '--primary': document.getElementById('cp-primary').value,
+            '--secondary': document.getElementById('cp-secondary').value,
+            '--accent': document.getElementById('cp-accent').value,
+            '--text-color': document.getElementById('cp-text-color').value
+        };
+
+        localStorage.setItem(`custom_colors_${currentTheme}`, JSON.stringify(colorConfig));
+        alert(`🎉 Đã lưu cấu hình bảng màu tùy chỉnh cho chế độ ${currentTheme === 'light' ? 'Sáng' : 'Tối'}!`);
+        closeColorModal();
+    }
+
+    // Khôi phục về cài đặt gốc pastel mặc định ban đầu
+    function resetToDefaultColors() {
+        if (confirm("Bạn có chắc chắn muốn xóa tùy chỉnh và khôi phục về bảng màu pastel mặc định gốc không?")) {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            localStorage.removeItem(`custom_colors_${currentTheme}`);
+            
+            const targets = ['--bg-color', '--card-bg', '--primary', '--secondary', '--accent', '--text-color'];
+            targets.forEach(t => document.documentElement.style.removeProperty(t));
+            
+            closeColorModal();
+            alert("Đã khôi phục cài đặt màu sắc chuẩn ban đầu thành công!");
+        }
+    }
 </script>
 </body>
 </html>
