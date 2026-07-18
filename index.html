@@ -3,91 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Flashcard JLPT N1 🌸</title>
+    <title>JLPT N1</title>
     
-    <!-- CẤU HÌNH PWA CHUẨN TRÊN ĐIỆN THOẠI -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="N1 Flashcard">
+    <meta name="apple-mobile-web-app-title" content="N1 Tettei">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* BẢNG MÀU CHUẨN PASTEL (SAGE & SKY PALETTE) */
         :root[data-theme="light"] {
-            --bg-color: #F8FAF8;
-            --card-bg: #FFFFFF;
-            --primary: #7FB69B;
-            --secondary: #A8DADC;
-            --accent: #F4A261;
-            --success: #74C69D;
-            --warning: #E9C46A;
-            --error: #E76F51;
-            --text-color: #2D3436;
-            --text-muted: #6C757D;
-            --border-color: #E2E8F0;
+            --bg-color: #F0F7FF;
+            --card-bg: #FDFFFF;
+            --primary: #7BB6FF;
+            --secondary: #A8D5FF;
+            --accent: #FFD6A5;
+            --success: #A7E3C2;
+            --warning: #FFE08A;
+            --error: #FFB3B3;
+            --text-color: #1E3A8A;
+            --text-muted: #64748B;
+            --border-color: #D6E4F7;
             --blur-bg: #E2E8F0;
             --option-bg: #FFFFFF;
-            --option-text: #2D3436;
-            --highlight-bg: rgba(244, 162, 97, 0.25);
-            --highlight-text: #E76F51;
-            --search-match-bg: rgba(233, 196, 106, 0.4);
-
-            /* Màu nền nhạt theo mức độ ôn tập cho Thẻ Flashcard */
-            --bg-lvl-again: rgba(231, 111, 81, 0.12);
-            --bg-lvl-hard: rgba(233, 196, 106, 0.12);
-            --bg-lvl-good: rgba(116, 198, 157, 0.12);
-            --bg-lvl-easy: rgba(127, 182, 155, 0.12);
+            --option-text: #1E3A8A;
+            --highlight-bg: rgba(255, 214, 165, 0.6);
+            --highlight-text: #1E3A8A;
+            
+            --bg-lvl-again: rgba(255, 179, 179, 0.2);
+            --bg-lvl-hard: rgba(255, 224, 138, 0.2);
+            --bg-lvl-good: rgba(167, 227, 194, 0.2);
+            --bg-lvl-easy: rgba(168, 213, 255, 0.2);
         }
 
         :root[data-theme="dark"] {
-            --bg-color: #1F2937;
-            --card-bg: #2D3748;
-            --primary: #9FD3C7;
-            --secondary: #8ECAE6;
-            --accent: #F6BD60;
-            --success: #95D5B2;
-            --warning: #FFD166;
+            --bg-color: #0E1A2B;
+            --card-bg: #16233A;
+            --primary: #7FB8FF;
+            --secondary: #9CC8FF;
+            --accent: #FFD6A5;
+            --success: #7BD4A3;
+            --warning: #FFC16A;
             --error: #FF6B6B;
-            --text-color: #F8F9FA;
-            --text-muted: #CBD5E1;
-            --border-color: #4A5568;
-            --blur-bg: #4A5568;
-            --option-bg: #2D3748;
-            --option-text: #F8F9FA;
-            --highlight-bg: rgba(246, 189, 96, 0.25);
-            --highlight-text: #F6BD60;
-            --search-match-bg: rgba(255, 209, 102, 0.4);
+            --text-color: #E6F1FF;
+            --text-muted: #A3B1C6;
+            --border-color: #23324A;
+            --blur-bg: #1B2B3A;
+            --option-bg: #16233A;
+            --option-text: #E6F1FF;
+            --highlight-bg: rgba(255, 193, 106, 0.3);
+            --highlight-text: #FFC16A;
 
-            /* Màu nền nhạt theo mức độ ôn tập cho Thẻ Flashcard */
-            --bg-lvl-again: rgba(255, 107, 107, 0.15);
-            --bg-lvl-hard: rgba(255, 193, 106, 0.15);
-            --bg-lvl-good: rgba(123, 212, 163, 0.15);
-            --bg-lvl-easy: rgba(159, 211, 199, 0.15);
+            --bg-lvl-again: rgba(255, 107, 107, 0.16);
+            --bg-lvl-hard: rgba(255, 193, 106, 0.16);
+            --bg-lvl-good: rgba(123, 212, 163, 0.16);
+            --bg-lvl-easy: rgba(156, 200, 255, 0.16);
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
         }
 
         body {
             font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
             padding: 0 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100dvh; /* Hỗ trợ dynamic viewport tránh thanh địa chỉ Safari đè lên */
+            height: 100dvh;
             box-sizing: border-box;
             transition: background-color 0.3s, color 0.3s;
             -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%;
-            overflow: hidden;
         }
 
         .header-row {
@@ -97,11 +95,11 @@
             align-items: center;
             width: 100%;
             max-width: 430px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             margin-top: calc(env(safe-area-inset-top) + 4px);
             flex-shrink: 0;
         }
-        h1.title { font-size: 20px; margin: 0; color: var(--primary); font-weight: bold; text-align: center; }
+        h1.title { font-size: 18px; margin: 0; color: var(--text-color); font-weight: bold; text-align: center; }
         
         .theme-toggle-btn {
             position: absolute;
@@ -115,8 +113,7 @@
             transition: color 0.2s;
         }
         #theme-toggle { right: 0; }
-        #color-picker-toggle { right: 32px; font-size: 18px; }
-        #offline-toggle { right: 68px; font-size: 18px;}
+        #color-custom-toggle { right: 32px; font-size: 17px; }
 
         .container { 
             width: 100%; 
@@ -124,8 +121,8 @@
             flex: 1;
             display: flex; 
             flex-direction: column; 
-            gap: 8px; 
-            margin-bottom: calc(env(safe-area-inset-bottom) + 6px);
+            gap: 6px; 
+            margin-bottom: calc(env(safe-area-inset-bottom) + 8px);
             overflow: hidden;
         }
 
@@ -135,79 +132,80 @@
             justify-content: space-between; 
             gap: 8px; 
             background-color: var(--card-bg);
-            padding: 8px 12px;
-            border-radius: 12px;
+            padding: 6px 12px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             flex-shrink: 0;
         }
         .select-wrapper { display: flex; align-items: center; gap: 4px; flex: 1; }
         .select-wrapper label { font-size: 12px; font-weight: bold; color: var(--text-muted); white-space: nowrap; }
-        select { width: 100%; background-color: transparent; color: var(--text-color); border: none; padding: 4px 0; font-size: 13px; outline: none; font-weight: 600; cursor: pointer; }
+        select { width: 100%; background-color: transparent; color: var(--text-color); border: none; padding: 2px 0; font-size: 13px; outline: none; font-weight: 600; cursor: pointer; }
         select option { background-color: var(--option-bg); color: var(--option-text); }
 
         .file-input-label {
             display: inline-flex;
             align-items: center;
-            background-color: transparent;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
+            background-color: var(--primary) !important;
+            color: #FFFFFF !important;
+            border: none !important;
             padding: 4px 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 11px;
             font-weight: bold;
             white-space: nowrap;
             transition: all 0.2s;
         }
-        .file-input-label:hover { background-color: var(--primary); color: white; }
         #excel-file { display: none; }
 
         .bookmark-filter { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-weight: 500; }
 
         .mode-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; flex-shrink: 0; }
-        .mode-btn { background-color: transparent; color: var(--text-muted); border: 1.5px solid var(--border-color); padding: 10px 2px; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s;}
-        .mode-btn.active { background-color: rgba(127, 182, 155, 0.15); color: var(--primary); border-color: var(--primary); }
-        :root[data-theme="dark"] .mode-btn.active { background-color: rgba(159, 211, 199, 0.15); }
+        .mode-btn { background-color: transparent; color: var(--text-muted); border: 1.5px solid var(--border-color); padding: 8px 2px; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s;}
+        .mode-btn.active { background-color: var(--primary) !important; color: #FFFFFF !important; border-color: var(--primary) !important; }
 
         .tab-content { display: none; flex-direction: column; width: 100%; flex: 1; overflow: hidden; }
 
         /* CARD STYLE */
-        .flashcard { width: 100%; flex: 1; min-height: 200px; perspective: 1000px; margin: 2px 0; cursor: pointer; }
+        .flashcard { width: 100%; flex: 1; min-height: 180px; perspective: 1000px; margin: 2px 0; cursor: pointer; }
         .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.4s; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; }
         .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
         
-        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 18px; padding: 20px 14px; box-sizing: border-box; background-color: var(--card-bg); border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: background-color 0.25s, border-color 0.25s; }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; padding: 12px; box-sizing: border-box; background-color: var(--card-bg); border: 2px solid var(--border-color) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: background-color 0.25s, border-color 0.25s; }
         .flashcard-front { display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotateY(0deg); -webkit-transform: rotateY(0deg); }
-        .flashcard-back { color: var(--text-color); display: flex; flex-direction: column; align-items: center; justify-content: space-around; text-align: center; transform: rotateY(180deg); -webkit-transform: rotateY(180deg); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .flashcard-back { color: var(--text-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; transform: rotateY(180deg); -webkit-transform: rotateY(180deg); overflow-y: auto; padding-top: 24px; padding-bottom: 20px;}
         
-        /* Đồng bộ viền và nền động khi thẻ thuộc các mức độ ôn tập khác nhau */
         .flashcard.lvl-again .flashcard-front, .flashcard.lvl-again .flashcard-back { border-color: var(--error) !important; background-color: var(--bg-lvl-again); }
         .flashcard.lvl-hard .flashcard-front, .flashcard.lvl-hard .flashcard-back { border-color: var(--warning) !important; background-color: var(--bg-lvl-hard); }
         .flashcard.lvl-good .flashcard-front, .flashcard.lvl-good .flashcard-back { border-color: var(--success) !important; background-color: var(--bg-lvl-good); }
-        .flashcard.lvl-easy .flashcard-front, .flashcard.lvl-easy .flashcard-back { border-color: var(--primary) !important; background-color: var(--bg-lvl-easy); }
+        .flashcard.lvl-easy .flashcard-front, .flashcard.lvl-easy .flashcard-back { border-color: var(--secondary) !important; background-color: var(--bg-lvl-easy); }
 
         .flashcard.flipped .flashcard-front { visibility: hidden; }
         .flashcard:not(.flipped) .flashcard-back { visibility: hidden; }
 
-        .card-icon-top { position: absolute; top: 12px; font-size: 16px; cursor: pointer; z-index: 10; }
-        .star-icon { left: 14px; }
-        .eye-icon { right: 14px; font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .card-icon-top { position: absolute; top: 10px; font-size: 16px; cursor: pointer; z-index: 10; }
+        .star-icon { left: 12px; }
+        .eye-icon { right: 12px; font-size: 11px; color: var(--text-muted); font-weight: 500; }
 
-        .word-main { font-size: 46px; font-weight: bold; margin: 0; color: var(--text-color); font-family: "Noto Sans JP", sans-serif; word-break: break-word; }
-        .audio-btn { background: rgba(124, 181, 155, 0.15); border: none; color: var(--primary); border-radius: 50%; width: 30px; height: 30px; font-size: 12px; cursor: pointer; margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+        .word-main { font-size: 42px; font-weight: bold; margin: 0; color: var(--text-color) !important; font-family: "Noto Sans JP", sans-serif; word-break: break-all; }
+        .audio-btn { background: rgba(123, 182, 255, 0.2); border: none; color: var(--primary); border-radius: 50%; width: 28px; height: 28px; font-size: 11px; cursor: pointer; margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
 
         .fb-container-top { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
-        .fb-hanviet { font-size: 22px; color: var(--accent); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .fb-hanviet { font-size: 22px; color: var(--text-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .fb-kana { font-size: 16px; color: var(--text-muted); font-weight: 500; margin: 0; display: flex; align-items: center; justify-content: center; }
-        .fb-mean { font-size: 19px; font-weight: bold; margin: 2px 0; color: var(--text-color); }
+        .fb-mean { font-size: 18px; font-weight: bold; margin: 2px 0; color: var(--text-color); }
 
-        .blur-box { filter: blur(6px); background: var(--blur-bg); border-radius: 5px; padding: 2px 8px; cursor: pointer; color: transparent; display: inline-block; transition: filter 0.25s; user-select: none; }
+        /* Vùng ví dụ được tùy chỉnh căn giữa, có đường phân cách và không có viền trái màu đặc */
+        .example-box { width: 100%; margin-top: 12px; padding: 12px 6px 6px 6px; text-align: center; box-sizing: border-box; border-top: 1px dashed var(--border-color); border-left: none; background-color: transparent;}
+        .example-jp { font-size: 14px; font-weight: 500; color: var(--text-color); margin-bottom: 6px; font-family: "Noto Sans JP", sans-serif; line-height: 1.4; word-break: break-all; display: flex; align-items: center; justify-content: center; gap: 4px;}
+        .example-vi-container { font-size: 13px; line-height: 1.4; color: var(--text-muted); margin-top: 4px; }
+
+        .blur-box { filter: blur(6px); background: var(--blur-bg); border-radius: 4px; padding: 2px 8px; cursor: pointer; color: transparent; display: inline-block; transition: filter 0.25s; user-select: none; }
         .blur-box.revealed { filter: none; background: transparent; color: inherit; user-select: text; }
+        #type-hint.revealed { color: var(--primary); }
 
-        mark.highlight-word { background-color: var(--highlight-bg); color: var(--highlight-text); font-weight: bold; padding: 0 3px; border-radius: 4px; }
-        mark.search-match { background-color: var(--search-match-bg); color: inherit; border-radius: 2px; }
+        mark.highlight-word { background-color: var(--highlight-bg); color: var(--highlight-text); font-weight: bold; padding: 1px 4px; border-radius: 4px; margin: 0 1px; }
 
-        /* ĐỒNG BỘ ĐỊNH DẠNG VÀ MÀU SẮC CHO PHÍM CHUYỂN THẺ (TRƯỚC / TIẾP / TRỘN) THEO COPY 4 */
         .nav-buttons { display: flex; justify-content: space-between; align-items: stretch; width: 100%; gap: 8px; margin-top: 2px; flex-shrink: 0; }
         .nav-btn { padding: 10px 4px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; border: none !important; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         
@@ -222,10 +220,9 @@
 
         .progress-container { width: 100%; display: flex; flex-direction: column; gap: 2px; margin: 2px 0; flex-shrink: 0; }
         .progress-bar-bg { width: 100%; height: 5px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; width: 0%; background-color: var(--success); transition: width 0.3s ease; }
+        .progress-bar-fill { height: 100%; width: 0%; background-color: var(--primary); transition: width 0.3s ease; }
         .progress-info { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--text-muted); }
 
-        /* ĐỒNG BỘ HOÀN TOÀN ĐỊNH DẠNG PANEL ĐỘ KHÓ VÀ CHỮ THEO COPY 4 */
         .difficulty-panel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 100%; margin: 2px 0; flex-shrink: 0; }
         .diff-btn { background-color: var(--card-bg) !important; border-radius: 8px; padding: 6px 2px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; transition: transform 0.1s; position: relative; box-sizing: border-box; color: var(--text-color) !important; border: 1.5px solid var(--border-color) !important; }
         .diff-btn:active { transform: scale(0.96); }
@@ -240,69 +237,58 @@
 
         .diff-btn.active-choice { box-shadow: 0 0 6px rgba(0, 0, 0, 0.15); font-weight: 900; background-color: var(--border-color) !important; }
 
-        footer { display: flex; justify-content: center; gap: 12px; font-size: 12px; margin-top: auto; padding-top: 4px; width: 100%; max-width: 430px; box-sizing: border-box; flex-shrink: 0; }
-        footer a { color: var(--primary); text-decoration: none; font-weight: bold; cursor: pointer; }
+        footer { display: flex; justify-content: center; gap: 12px; font-size: 12px; margin-top: auto; padding: 8px 0; width: 100%; flex-shrink: 0; }
+        footer a { color: var(--text-muted); text-decoration: none; font-weight: bold; cursor: pointer; }
 
-        /* GIAO DIỆN MỤC GÕ TỪ */
-        .quiz-stats-board { display: flex; justify-content: space-around; background-color: var(--card-bg); padding: 8px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 12px; font-weight: bold; margin-bottom: 4px; flex-shrink: 0; }
+        .quiz-stats-board { display: flex; justify-content: space-around; background-color: var(--card-bg); padding: 6px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 12px; font-weight: bold; margin-bottom: 2px; flex-shrink: 0; }
         .stat-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
         .stat-label { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
-        .stat-val.correct { color: var(--success); font-size: 14px; }
-        .stat-val.wrong { color: var(--error); font-size: 14px; }
-        .stat-val.total { color: var(--text-color); font-size: 14px; }
+        .stat-val.correct { color: #FFFFFF; padding: 1px 6px; background: var(--success); border-radius: 4px; font-size: 13px; }
+        .stat-val.wrong { color: #FFFFFF; padding: 1px 6px; background: var(--error); border-radius: 4px; font-size: 13px; }
+        .stat-val.total { color: var(--text-color); font-size: 13px; }
 
-        .quiz-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 18px; padding: 20px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 1; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow-y: auto; }
-        .quiz-question { font-size: 48px; font-weight: bold; text-align: center; color: var(--primary); margin: 0; font-family: "Klee One", "UD Digi Kyokasho N-R", serif; }
+        .quiz-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 1; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow-y: auto; }
+        .quiz-question { font-size: 46px; font-weight: bold; text-align: center; color: var(--text-color); margin: 0; font-family: "Klee One", "UD Digi Kyokasho N-R", serif; }
         .quiz-hint-wrapper { text-align: center; font-size: 13px; color: var(--text-muted); }
-        .quiz-hint-text { font-weight: 600; color: var(--accent); font-size: 15px; margin-top: 2px; display: block; }
+        .quiz-hint-text { font-weight: 600; color: var(--primary); font-size: 15px; margin-top: 2px; display: block; }
 
-        .game-input { width: 100%; padding: 12px; font-size: 16px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 12px; outline: none; color: var(--text-color); box-sizing: border-box; text-align: center; font-weight: 600; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
+        .game-input { width: 100%; padding: 12px; font-size: 15px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 10px; outline: none; color: var(--text-color); box-sizing: border-box; text-align: center; font-weight: 600; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
         .game-input:focus { border-color: var(--primary); }
         .type-actions { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 
-        .search-box-wrapper { width: 100%; margin-bottom: 6px; box-sizing: border-box; flex-shrink: 0; }
-        .search-input { width: 100%; padding: 8px 12px; font-size: 14px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
+        .search-box-wrapper { width: 100%; margin-bottom: 4px; box-sizing: border-box; flex-shrink: 0; }
+        .search-input { width: 100%; padding: 8px 12px; font-size: 13px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; outline: none; color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s; font-family: "Noto Sans JP", sans-serif;}
         .search-input:focus { border-color: var(--primary); }
 
-        .vocab-table-wrapper { flex: 1; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 14px; background: var(--card-bg); -webkit-overflow-scrolling: touch; margin-bottom: 4px; }
+        .vocab-table-wrapper { flex: 1; min-height: 200px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 12px; background: var(--card-bg); -webkit-overflow-scrolling: touch; margin-bottom: 2px; }
         .vocab-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; white-space: nowrap; }
-        .vocab-table th, .vocab-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        .vocab-table th { background: var(--primary); color: white; position: sticky; top: 0; z-index: 100; font-weight: 600; }
+        .vocab-table th, .vocab-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .vocab-table th { background: var(--primary); color: #FFFFFF; position: sticky; top: 0; z-index: 100; font-weight: 600; }
+        
         .vocab-table th:first-child, .vocab-table td:first-child { text-align: center; width: 50px; min-width: 50px; max-width: 55px; font-weight: bold; box-sizing: border-box; }
-        :root[data-theme="dark"] .vocab-table th { color: #1F2937; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-        .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px 18px; text-align: center; position: relative; width: 88%; max-width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 2011; box-sizing: border-box; }
+        .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px 16px; text-align: center; position: relative; width: 88%; max-width: 365px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2011; max-height: 90vh; overflow-y: auto;}
         .modal-close { position: absolute; top: 8px; right: 14px; font-size: 20px; cursor: pointer; color: var(--text-muted); }
         
-        .modal-kanji { font-size: 56px; font-weight: bold; color: var(--primary); font-family: "Klee One", "UD Digi Kyokasho N-R", serif; }
-        .modal-hanviet { margin-top: 6px; font-size: 15px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .modal-kanji { font-size: 54px; font-weight: bold; color: var(--text-color); font-family: "Klee One", "UD Digi Kyokasho N-R", serif; word-break: break-all;}
+        .modal-hanviet { margin-top: 6px; font-size: 15px; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .modal-kana { margin-top: 4px; font-size: 14px; color: var(--text-color); }
-        .modal-meaning { margin-top: 6px; font-size: 16px; font-weight: 600; }
-        .modal-divider { border: none; border-top: 1px dashed var(--border-color); margin: 12px 0; }
-        .modal-example-jp { font-size: 14px; color: var(--text-color); line-height: 1.4; margin-bottom: 4px; }
-        .modal-example-vi { font-size: 12px; color: var(--text-muted); line-height: 1.4; display: inline-block; }
+        .modal-meaning { margin-top: 6px; font-size: 16px; font-weight: 600; margin-bottom: 6px; }
         
-        .modal-action-btn { background-color: transparent; border: 1.5px solid var(--primary); color: var(--primary); padding: 6px 14px; border-radius: 18px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
-        .modal-action-btn:hover { background-color: var(--primary); color: white; }
+        .modal-action-btn { background-color: transparent; border: 1.5px solid var(--border-color); color: var(--text-color); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+        .modal-action-btn:hover { background-color: var(--primary); color: #FFFFFF; }
 
-        .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; text-align: left; }
-        .color-picker-item { display: flex; flex-direction: column; gap: 3px; }
-        .color-picker-item label { font-size: 12px; font-weight: bold; color: var(--text-color); }
-        .color-input-wrapper { display: flex; align-items: center; width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-color); }
-        .color-input-wrapper input[type="color"] { border: none; width: 100%; height: 100%; padding: 0; background: transparent; cursor: pointer; }
-        .color-modal-footer { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
-        .color-modal-btn { flex: 1; padding: 10px; border-radius: 12px; font-weight: bold; font-size: 13px; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
-        .btn-restore { background: transparent; border-color: var(--border-color); color: var(--text-color); }
-        .btn-done { background: var(--primary); color: #1F2937; }
+        .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; text-align: left; font-size: 12px; }
+        .picker-item { display: flex; flex-direction: column; gap: 2px; }
+        .picker-item input { width: 100%; height: 30px; border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; background: transparent; }
     </style>
 </head>
 <body>
 
 <div class="header-row">
-    <h1 class="title">Flashcard JLPT N1 🌸</h1>
-    <button id="offline-toggle" class="theme-toggle-btn" onclick="toggleOffline()" title="Bật/Tắt chế độ Offline">📶</button>
-    <button id="color-picker-toggle" class="theme-toggle-btn" onclick="openColorModal()" title="Tùy chỉnh màu sắc">🎨</button>
+    <h1 class="title">JLPT N1</h1>
+    <button id="color-custom-toggle" class="theme-toggle-btn" onclick="openColorCustomPopup()" title="Tùy chỉnh màu">🎨</button>
     <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Sáng/Tối">☀️</button>
 </div>
 
@@ -316,12 +302,11 @@
         <input type="file" id="excel-file" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
     </div>
 
-    <!-- KHU VỰC BỘ LỌC ĐA NĂNG ĐỒNG BỘ THEO FILE COPY 4 -->
-    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin: 2px 0; flex-shrink: 0;">
+    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0; flex-shrink: 0;">
         <label class="bookmark-filter">
-            <input type="checkbox" id="only-bookmarked" onchange="filterData()"> ⭐ Từ chú ý
+            <input type="checkbox" id="only-bookmarked" onchange="filterData()"> ⭐ Từ cần chú ý
         </label>
-        <div class="select-wrapper" style="max-width: 140px; background-color: var(--card-bg); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div class="select-wrapper" style="max-width: 130px;">
             <label>Mức độ:</label>
             <select id="level-filter" onchange="filterData()">
                 <option value="all">Tất cả</option>
@@ -364,16 +349,19 @@
                     
                     <div class="fb-mean" id="fc-meaning">-</div>
                     
-                    <div style="font-size: 13px; color: var(--primary); margin: 4px 0; display:none;" id="fc-same-box">
-                        Từ đồng nghĩa: <span class="blur-box" id="fc-same" onclick="revealBlur(event, this)"></span>
+                    <!-- Hộp câu ví dụ ở Flashcard -->
+                    <div id="fc-example-box" class="example-box" style="display: none;" onclick="event.stopPropagation();">
+                        <div class="example-jp">
+                            <span id="fc-example-jp"></span>
+                            <button class="audio-btn" style="width:24px; height:24px; font-size:10px;" onclick="speakExampleJpText(event, 'fc-example-jp')">🔊</button>
+                        </div>
+                        <div class="example-vi-container">
+                            <span class="blur-box" id="fc-example-vi" onclick="revealBlur(event, this)"></span>
+                        </div>
                     </div>
                     
-                    <div style="font-size:13px; border-top:1px dashed var(--border-color); padding-top:10px; width:100%; display: flex; flex-direction: column; align-items: center; gap: 6px;" id="fc-ex-box">
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <span id="fc-ex-jp" style="font-style:italic; font-size:14px; color: var(--text-color); text-align: center;"></span>
-                            <button class="audio-btn" onclick="speakCurrentExample(event)">🔊</button>
-                        </div>
-                        <span class="blur-box" id="fc-ex-vi" onclick="revealBlur(event, this)"></span>
+                    <div style="font-size: 13px; color: var(--text-color); margin: 4px 0 2px 0; display:none;" id="fc-same-box">
+                        Từ đồng nghĩa: <span class="blur-box" id="fc-same" onclick="revealBlur(event, this)"></span>
                     </div>
                 </div>
             </div>
@@ -395,7 +383,6 @@
             </div>
         </div>
 
-        <!-- ĐỒNG BỘ NÚT BẤM VÀ TEXT CHỮ THEO ĐÚNG ĐỊNH DẠNG KHÔNG CHỨA EMOJI CỦA COPY 4 -->
         <div class="difficulty-panel">
             <button id="btn-diff-all" class="diff-btn diff-all" onclick="document.getElementById('level-filter').value='all'; filterData();"><span class="diff-icon">Tất cả</span><span id="badge-all">0</span></button>
             <button id="btn-diff-again" class="diff-btn diff-again" onclick="handleDifficulty('again', event)"><span class="diff-icon">Học lại</span><span id="badge-again">0</span></button>
@@ -405,7 +392,7 @@
         </div>
 
         <footer>
-            <a id="fc-gemini" href="#" target="_blank" onclick="handleExternalLink(event)">🔍 Tra Gemini</a>
+            <a id="fc-gemini" href="#" target="_blank">🔍 Tra Gemini</a>
             <span style="color:var(--border-color)">|</span>
             <a onclick="openMaziiApp(event)">📖 Từ điển Mazii</a>
         </footer>
@@ -432,31 +419,35 @@
             <div class="quiz-question" id="type-q">-</div>
             <div class="quiz-hint-wrapper">
                 Gợi ý ý nghĩa:
-                <span id="type-hint" class="quiz-hint-text">-</span>
+                <span id="type-hint" class="quiz-hint-text blur-box" onclick="revealBlur(event, this)">-</span>
             </div>
+            
+            <p id="type-feedback" style="text-align:center; font-weight:bold; font-size:13px; height:18px; margin: 0;"></p>
             
             <input type="text" id="type-input" class="game-input" placeholder="Nhập cách đọc Hiragana/Kana..." onkeydown="checkTyping(event)" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
             
             <div class="type-actions">
-                <button id="type-skip-btn" class="mode-btn" style="width: 100%; padding: 12px; border-radius: 12px;" onclick="skipTyping()">Bỏ qua / Câu khác</button>
-                <button class="mode-btn" style="width: 100%; padding: 12px; border-radius: 12px; margin-top: 4px;" onclick="openTypingHistory()">📝 Xem lịch sử gõ</button>
+                <button id="type-skip-btn" class="mode-btn" style="width: 100%; padding: 10px; border-radius: 10px;" onclick="skipTyping()">Bỏ qua / Câu khác</button>
+                <button class="mode-btn" style="width: 100%; padding: 10px; border-radius: 10px; margin-top: 2px;" onclick="openTypingHistory()">📝 Xem lịch sử gõ</button>
             </div>
-            <p id="type-feedback" style="text-align:center; font-weight:bold; font-size:13px; height:20px; margin: 0;"></p>
         </div>
+        <footer>
+            <span style="opacity: 0.5; font-size: 11px;"></span>
+        </footer>
     </div>
 
     <!-- TAB DANH SÁCH -->
     <div id="tab-manager" class="tab-content" style="display: none;">
         <div class="search-box-wrapper">
-            <input type="text" id="vocab-search-input" class="search-input" placeholder="🔍 Tra toàn bộ bài học (Kanji, Hán Việt, Ý nghĩa)..." oninput="filterManagerList()">
+            <input type="text" id="vocab-search-input" class="search-input" placeholder="🔍 Tra TOÀN BỘ bài học (Kanji, Hán Việt, Ý nghĩa)..." oninput="filterManagerList()">
         </div>
 
-        <h3 id="manager-title" style="margin:2px 0 6px 0; font-size:13px; color:var(--primary);">Danh sách</h3>
+        <h3 id="manager-title" style="margin:2px 0 4px 0; font-size:13px; color:var(--text-color);">Danh sách</h3>
         <div class="vocab-table-wrapper">
             <table class="vocab-table">
                 <thead>
                     <tr>
-                        <th style="line-height:1.2; text-align:center; min-width: 60px;">STT</th>
+                        <th>STT</th>
                         <th>⭐</th>
                         <th>👁️</th>
                         <th>Từ vựng</th>
@@ -468,47 +459,9 @@
                 <tbody id="vocab-list-tbody"></tbody>
             </table>
         </div>
-    </div>
-</div>
-
-<!-- Modal Tùy Chỉnh Màu Sắc -->
-<div id="color-custom-modal" class="modal-overlay" onclick="closeColorModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="modal-close" onclick="closeColorModal()">&times;</span>
-        <h3 style="margin-top:0; color:var(--primary); font-size:18px;" id="color-modal-title">Tùy chỉnh bảng màu</h3>
-        <p id="color-modal-subtitle" style="font-size:11px; color:var(--text-muted); margin:-6px 0 10px 0;">Đang sửa cấu hình giao diện: SÁNG</p>
-        
-        <div class="color-picker-grid">
-            <div class="color-picker-item">
-                <label>Màu Nền:</label>
-                <div class="color-input-wrapper"><input type="color" id="cp-bg-color" oninput="applyLiveColor('--bg-color', this.value)"></div>
-            </div>
-            <div class="color-picker-item">
-                <label>Nền Thẻ Card:</label>
-                <div class="color-input-wrapper"><input type="color" id="cp-card-bg" oninput="applyLiveColor('--card-bg', this.value)"></div>
-            </div>
-            <div class="color-picker-item">
-                <label>Màu Chủ Đạo:</label>
-                <div class="color-input-wrapper"><input type="color" id="cp-primary" oninput="applyLiveColor('--primary', this.value)"></div>
-            </div>
-            <div class="color-picker-item">
-                <label>Màu Phụ:</label>
-                <div class="color-input-wrapper"><input type="color" id="cp-secondary" oninput="applyLiveColor('--secondary', this.value)"></div>
-            </div>
-            <div class="color-picker-item">
-                <label>Điểm Nhấn:</label>
-                <div class="color-input-wrapper"><input type="color" id="cp-accent" oninput="applyLiveColor('--accent', this.value)"></div>
-            </div>
-            <div class="color-picker-item">
-                <label>Màu Chữ:</label>
-                <div class="color-input-wrapper"><input type="color" id="cp-text-color" oninput="applyLiveColor('--text-color', this.value)"></div>
-            </div>
-        </div>
-
-        <div class="color-modal-footer">
-            <button class="color-modal-btn btn-restore" onclick="resetToDefaultColors()">Khôi phục chuẩn</button>
-            <button class="color-modal-btn btn-done" onclick="saveCustomColors()">Hoàn tất</button>
-        </div>
+        <footer>
+            <span style="opacity: 0.5; font-size: 11px;"></span>
+        </footer>
     </div>
 </div>
 
@@ -520,9 +473,18 @@
         <div id="modal-hanviet-text" class="modal-hanviet"></div>
         <div id="modal-kana-text" class="modal-kana"></div>
         <div id="modal-meaning-text" class="modal-meaning"></div>
-        <hr class="modal-divider">
-        <div id="modal-example-jp" class="modal-example-jp"></div>
-        <div id="modal-example-vi" class="modal-example-vi blur-box" onclick="revealBlur(event, this)"></div>
+        
+        <!-- Hộp câu ví dụ ở Popup xem chi tiết -->
+        <div id="modal-example-box" class="example-box" style="display: none; margin-bottom: 12px;">
+            <div class="example-jp">
+                <span id="modal-example-jp"></span>
+                <button class="audio-btn" style="width:24px; height:24px; font-size:10px;" onclick="speakExampleJpText(event, 'modal-example-jp')">🔊</button>
+            </div>
+            <div class="example-vi-container">
+                <span class="blur-box" id="modal-example-vi" onclick="revealBlur(event, this)"></span>
+            </div>
+        </div>
+
         <div>
             <button class="modal-action-btn" onclick="openMaziiFromPopup(event)">📖 Tra từ điển Mazii</button>
         </div>
@@ -531,10 +493,10 @@
 
 <!-- Modal Lịch sử Gõ từ -->
 <div id="typing-history-modal" class="modal-overlay" onclick="closeTypingHistory()">
-    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 75vh; display: flex; flex-direction: column; width: 92%; max-width: 400px; padding: 16px;">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 75vh; display: flex; flex-direction: column; width: 90%; max-width: 400px; padding: 16px;">
         <span class="modal-close" onclick="closeTypingHistory()">&times;</span>
-        <h3 style="margin-top: 0; margin-bottom: 10px; color: var(--primary); font-size: 16px;">Lịch sử gõ từ</h3>
-        <div style="flex: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-color); -webkit-overflow-scrolling: touch;">
+        <h3 style="margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 16px;"> Lịch sử gõ từ</h3>
+        <div style="flex: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-color);">
             <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
                 <thead style="position: sticky; top: 0; background: var(--blur-bg); z-index: 10;">
                     <tr>
@@ -546,7 +508,75 @@
                 <tbody id="type-history-tbody"></tbody>
             </table>
         </div>
-        <button class="mode-btn" style="width: 100%; padding: 10px; margin-top: 12px; color: var(--error); border-color: var(--error);" onclick="clearTypingHistory()">🗑 Làm mới danh sách</button>
+        <button class="mode-btn" style="width: 100%; padding: 10px; margin-top: 12px; color: #FFFFFF; background-color: var(--error);" onclick="clearTypingHistory()">🗑 Làm mới danh sách</button>
+    </div>
+</div>
+
+<!-- Modal Tùy Chỉnh Màu Sắc -->
+<div id="color-custom-modal" class="modal-overlay" onclick="closeColorCustomPopup()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="width: 90%; max-width: 360px;">
+        <span class="modal-close" onclick="closeColorCustomPopup()">&times;</span>
+        <h3 style="margin-top: 0; margin-bottom: 4px; color: var(--text-color); font-size: 16px;">Tùy chỉnh bảng màu</h3>
+        <p style="font-size:11px; color: var(--text-muted); margin-bottom:10px;" id="color-picker-theme-label">Đang sửa cấu hình theme: </p>
+        
+        <div class="color-picker-grid">
+            <div class="picker-item">
+                <label>Màu Nền:</label>
+                <input type="color" id="cp-bg" onchange="applyCustomColorStyle()">
+            </div>
+            <div class="picker-item">
+                <label>Nền Thẻ Card:</label>
+                <input type="color" id="cp-card" onchange="applyCustomColorStyle()">
+            </div>
+            <div class="picker-item">
+                <label>Màu Chủ Đạo:</label>
+                <input type="color" id="cp-primary" onchange="applyCustomColorStyle()">
+            </div>
+            <div class="picker-item">
+                <label>Màu Phụ:</label>
+                <input type="color" id="cp-secondary" onchange="applyCustomColorStyle()">
+            </div>
+            <div class="picker-item">
+                <label>Điểm Nhấn:</label>
+                <input type="color" id="cp-accent" onchange="applyCustomColorStyle()">
+            </div>
+            <div class="picker-item">
+                <label>Màu Chữ:</label>
+                <input type="color" id="cp-text" onchange="applyCustomColorStyle()">
+            </div>
+        </div>
+        
+        <div style="margin-top: 16px; display: flex; gap: 8px;">
+            <button class="mode-btn" style="flex:1; padding: 8px;" onclick="resetCustomColors()">Khôi phục chuẩn</button>
+            <button class="mode-btn active" style="flex:1; padding: 8px;" onclick="closeColorCustomPopup()">Hoàn tất</button>
+        </div>
+    </div>
+</div>
+
+<button id="sync-fab" style="position: fixed; bottom: 20px; right: 20px; z-index: 1999; background-color: var(--primary); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;" title="Đồng bộ giữa Laptop và Điện thoại">🔄</button>
+
+<div id="sync-modal" class="modal-overlay" onclick="closeSyncModal()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 350px; padding: 20px 16px;">
+        <span class="modal-close" onclick="closeSyncModal()">&times;</span>
+        <h3 style="color: var(--primary); margin-top: 0; margin-bottom: 6px; font-size: 18px;">Đồng Bộ Thiết Bị 🔄</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.3;">Hợp nhất tiến độ học tập. Có thể kết nối qua Bluetooth, 4G, hoặc các mạng Wifi khác nhau.</p>
+        
+        <div style="margin: 12px 0; text-align: left;">
+            <span style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px; color: var(--text-color);">Mã số 6 chữ số của thiết bị này:</span>
+            <div id="sync-my-id" style="background: var(--bg-color); color: var(--text-color); padding: 8px; border-radius: 8px; font-family: monospace; font-weight: bold; border: 1px dashed var(--border-color); text-align: center; font-size: 18px; letter-spacing: 2px;">------</div>
+        </div>
+        
+        <div id="sync-qrcode-container" style="display: flex; justify-content: center; margin: 12px 0; background: white; padding: 8px; border-radius: 8px; width: fit-content; margin-left: auto; margin-right: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.15);"></div>
+        
+        <hr class="modal-divider" style="margin: 12px 0;">
+        
+        <div style="margin: 12px 0; text-align: left;">
+            <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px; color: var(--text-color);">Nhập mã số thiết bị đối phương:</label>
+            <input type="text" id="sync-remote-id" class="game-input" style="font-size: 15px; padding: 8px; height: auto; font-family: monospace; letter-spacing: 1px;" placeholder="Nhập mã 6 số của máy kia..." maxlength="6">
+        </div>
+        
+        <button id="sync-action-btn" class="nav-btn btn-prev" style="width: 100%; padding: 10px; font-size: 13px;" onclick="connectToPeer()">Kết nối & Trộn dữ liệu</button>
+        <p id="sync-status-text" style="font-size: 12px; margin: 8px 0 0 0; font-weight: bold; color: var(--accent); min-height: 15px;"></p>
     </div>
 </div>
 
@@ -557,38 +587,19 @@
         });
     }
 
-    const DEFAULT_THEME_COLORS = {
-        light: {
-            '--bg-color': '#F8FAF8', '--card-bg': '#FFFFFF', '--primary': '#7FB69B',
-            '--secondary': '#A8DADC', '--accent': '#F4A261', '--text-color': '#2D3436'
-        },
-        dark: {
-            '--bg-color': '#1F2937', '--card-bg': '#2D3748', '--primary': '#9FD3C7',
-            '--secondary': '#8ECAE6', '--accent': '#F6BD60', '--text-color': '#F8F9FA'
-        }
-    };
-
-    function loadSavedColors() {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-        const savedCustom = localStorage.getItem(`custom_colors_${currentTheme}`);
-        if (savedCustom) {
-            const colors = JSON.parse(savedCustom);
-            for (const [key, value] of Object.entries(colors)) {
-                document.documentElement.style.setProperty(key, value);
-            }
-        } else {
-            const targets = ['--bg-color', '--card-bg', '--primary', '--secondary', '--accent', '--text-color'];
-            targets.forEach(t => document.documentElement.style.removeProperty(t));
-        }
-    }
+    window.addEventListener('pageshow', (event) => {
+        window.scrollTo(0, 0);
+        document.body.style.height = window.innerHeight + 'px';
+    });
+    window.addEventListener('resize', () => {
+        document.body.style.height = window.innerHeight + 'px';
+    });
 
     (function() {
-        const savedTheme = localStorage.getItem('app_theme') || 'dark';
+        const savedTheme = localStorage.getItem('app_theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
-        loadSavedColors();
+        applySavedCustomColors(savedTheme);
     })();
-
-    let isOfflineMode = false;
 
     function unlockAudio() {
         try {
@@ -605,20 +616,19 @@
 
     const KANJI_DICTIONARY = {
         "一":"NHẤT","二":"NHỊ","三":"TAM","四":"TỨ","五":"NGŨ","六":"LỤC","七":"THẤT","八":"BÁT","九":"CỬU","十":"THẬP",
-        "大":"ĐẠI","小":"TIỂU","中":"TRUNG","国":"QUỐC","人":"NHÂN","年":"NIÊN","生":"SINH","学":"HỌC","会":"HỘI","社":"XÃ"
+        "大":"ĐẠI","小":"TIỂU","中":"TRUNG","国":"QUỐC","人":"NHÂN","年":"NIÊN","生":"SINH","学":"HỌC","會":"HỘI","社":"XÃ"
     };
 
     let db = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {
-        "N1_Mondai_Demo": [
-            { kanji: "頑丈", kana: "がんじょう", meaning: "Chắc chắn, cứng cáp, khỏe mạnh", exampleJp: "この棚は頑丈に作られている。", exampleVi: "Cái kệ này được làm rất chắc chắn.", synonym: "", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
-            { kanji: "圧倒的", kana: "あっとうてき", meaning: "Một cách áp đảo, vượt trội", exampleJp: "圧倒的な强 sự cho 優勝した。", exampleVi: "Giành chiến thắng nhờ sức mạnh áp đảo.", synonym: "優勢", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 },
-            { kanji: "示唆", kana: "しさ", meaning: "Ám thị, khơi gợi, gợi ý", exampleJp: "彼の発言は多くのことを示唆している。", exampleVi: "Phát ngôn của anh ấy gợi ý rất nhiều điều.", synonym: "", flipCount: 0, starred: false, interval: 0, ease: 2.5, nextReview: 0 }
+        "N3_問題_1": [
+            { kanji: "包む", kana: "つつむ", meaning: "bọc, gói", exampleJp: "プレゼントをきれいな紙で包む。", exampleVi: "Bọc quà bằng giấy đẹp.", synonym: "", hanviet: "BAO", flipCount: 3, starred: false, interval: 0, ease: 2.5, nextReview: 0, difficulty: "unlearned" }
         ]
     };
     let currentList = [], activeWordIndex = 0, currentSheetName = "";
     let typingStats = { correct: 0, wrong: 0, total: 0 };
     let typeHistoryList = []; 
     let currentUtterance = null; 
+    let typingPool = []; 
 
     window.onload = () => { 
         updateThemeToggleIcon();
@@ -631,7 +641,7 @@
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('app_theme', newTheme);
         updateThemeToggleIcon();
-        loadSavedColors();
+        applySavedCustomColors(newTheme);
     }
 
     function updateThemeToggleIcon() {
@@ -639,24 +649,66 @@
         document.getElementById('theme-toggle').innerText = currentTheme === 'light' ? '🌙' : '☀️';
     }
 
-    function toggleOffline() {
-        isOfflineMode = !isOfflineMode;
-        const iconBtn = document.getElementById('offline-toggle');
-        iconBtn.innerText = isOfflineMode ? '📴' : '📶';
-        iconBtn.style.color = isOfflineMode ? 'var(--error)' : 'inherit';
-        
-        if (isOfflineMode) {
-            alert("Đã BẬT chế độ Offline 📴.\nPhát âm thanh, tra từ điển Mazii & Gemini sẽ bị khóa để không tốn Data mạng.");
+    function applySavedCustomColors(theme) {
+        const customColors = JSON.parse(localStorage.getItem(`custom_colors_${theme}`));
+        if (customColors) {
+            for (const [key, value] of Object.entries(customColors)) {
+                document.documentElement.style.setProperty(key, value);
+            }
         } else {
-            alert("Đã TẮT chế độ Offline 📶.\nCác tính năng mạng hoạt động bình thường.");
+            const props = ['--bg-color', '--card-bg', '--primary', '--secondary', '--accent', '--text-color'];
+            props.forEach(p => document.documentElement.style.removeProperty(p));
         }
     }
 
-    function handleExternalLink(e) {
-        if(isOfflineMode) {
-            e.preventDefault();
-            alert("Bạn đang ở chế độ Offline 📴.\nVui lòng bật lại mạng (📶) để sử dụng tính năng tra cứu ngoại tuyến!");
+    function openColorCustomPopup() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        document.getElementById('color-picker-theme-label').innerText = `Đang sửa cấu hình giao diện: ${theme === 'light' ? 'SÁNG (Light)' : 'TỐI (Dark)'}`;
+        
+        const computedStyle = getComputedStyle(document.documentElement);
+        document.getElementById('cp-bg').value = rgb2hex(computedStyle.getPropertyValue('--bg-color').trim());
+        document.getElementById('cp-card').value = rgb2hex(computedStyle.getPropertyValue('--card-bg').trim());
+        document.getElementById('cp-primary').value = rgb2hex(computedStyle.getPropertyValue('--primary').trim()); 
+        document.getElementById('cp-secondary').value = rgb2hex(computedStyle.getPropertyValue('--secondary').trim()); 
+        document.getElementById('cp-accent').value = rgb2hex(computedStyle.getPropertyValue('--accent').trim());
+        document.getElementById('cp-text').value = rgb2hex(computedStyle.getPropertyValue('--text-color').trim());
+        
+        document.getElementById('color-custom-modal').style.display = 'flex';
+    }
+
+    function closeColorCustomPopup() {
+        document.getElementById('color-custom-modal').style.display = 'none';
+    }
+
+    function applyCustomColorStyle() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        const config = {
+            '--bg-color': document.getElementById('cp-bg').value,
+            '--card-bg': document.getElementById('cp-card').value,
+            '--primary': document.getElementById('cp-primary').value,
+            '--secondary': document.getElementById('cp-secondary').value,
+            '--accent': document.getElementById('cp-accent').value,
+            '--text-color': document.getElementById('cp-text').value
+        };
+        for (const [key, val] of Object.entries(config)) {
+            document.documentElement.style.setProperty(key, val);
         }
+        localStorage.setItem(`custom_colors_${theme}`, JSON.stringify(config));
+    }
+
+    function resetCustomColors() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        localStorage.removeItem(`custom_colors_${theme}`);
+        applySavedCustomColors(theme);
+        closeColorCustomPopup();
+    }
+
+    function rgb2hex(rgb) {
+        if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+        let match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        if (!match) return '#ffffff';
+        function hex(x) { return ("0" + parseInt(x).toString(16)).slice(-2); }
+        return "#" + hex(match[1]) + hex(match[2]) + hex(match[3]);
     }
 
     function autoTranslateHanViet(text, customDb) {
@@ -673,18 +725,20 @@
         return result.length > 0 ? result.join(" ") : "";
     }
 
-    function highlightKeyword(sentence, keyword) {
-        if (!sentence || !keyword) return sentence || '';
-        const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        const regex = new RegExp(escapedKeyword, 'g');
-        return sentence.replace(regex, `<mark class="highlight-word">${keyword}</mark>`);
-    }
-
-    function highlightSearchText(text, keyword) {
-        if (!text || !keyword) return text || '';
+    function highlightSearchKeyword(text, keyword) {
+        if (!text) return '---';
+        if (!keyword) return text;
         const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         const regex = new RegExp(`(${escapedKeyword})`, 'gi');
-        return text.replace(regex, '<mark class="search-match">$1</mark>');
+        return text.replace(regex, `<mark class="highlight-word">$1</mark>`);
+    }
+
+    function highlightInSentence(sentence, keyword) {
+        if (!sentence) return '---';
+        if (!keyword) return sentence;
+        const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(`(${escapedKeyword})`, 'g');
+        return sentence.replace(regex, `<mark class="highlight-word">$1</mark>`);
     }
 
     function initSheetSelect() {
@@ -696,12 +750,12 @@
         loadSheet();
     }
 
-    function handleExcelUpload(event) {
-        const file = event.target.files[0]; if (!file) return;
+    function handleExcelUpload(e) {
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function(event) {
             try {
-                const data = new Uint8Array(e.target.result);
+                const data = new Uint8Array(event.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const newDb = {};
 
@@ -729,26 +783,33 @@
                     const worksheet = workbook.Sheets[sheetName]; const sheetData = [];
                     let rowIndex = 2; let emptyStreak = 0;
                     while (emptyStreak < 30) {
-                        const cellA = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 0})];
-                        const valA = cellA && cellA.v !== undefined ? String(cellA.v).trim() : "";
-                        if (valA) {
+                        const cellB = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 0})];
+                        const valB = cellB && cellB.v !== undefined ? String(cellB.v).trim() : "";
+                        
+                        if (valB) {
                             emptyStreak = 0;
-                            const cellB = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 1})];
-                            const cellC = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 2})];
-                            const cellD = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 3})];
-                            const cellE = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 4})];
-                            const cellF = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 5})];
-                            const cellG = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 6})];
-                            let hv = cellG && cellG.v !== undefined ? String(cellG.v).trim() : "";
-                            if (!hv) hv = autoTranslateHanViet(valA, newDb);
+                            const cellC = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 1})];
+                            const cellD = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 2})];
+                            const cellE = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 3})]; 
+                            const cellF = worksheet[XLSX.utils.encode_cell({r: rowIndex - 1, c: 4})]; 
+                            
+                            let hv = autoTranslateHanViet(valB, newDb);
+                            let targetMeaning = cellD && cellD.v !== undefined ? String(cellD.v).trim() : "";
+                            
+                            let exJp = cellE && cellE.v !== undefined ? String(cellE.v).trim() : "";
+                            let exVi = cellF && cellF.v !== undefined ? String(cellF.v).trim() : "";
+
                             sheetData.push({
-                                kanji: valA, kana: cellB && cellB.v !== undefined ? String(cellB.v).trim() : "",
-                                meaning: cellC && cellC.v !== undefined ? String(cellC.v).trim() : "",
-                                exampleJp: cellD && cellD.v !== undefined ? String(cellD.v).trim() : "",
-                                exampleVi: cellE && cellE.v !== undefined ? String(cellE.v).trim() : "",
-                                synonym: cellF && cellF.v !== undefined ? String(cellF.v).trim() : "",
-                                hanviet: hv, flipCount: 0, starred: false,
-                                interval: 0, ease: 2.5, nextReview: 0, userLevel: 'unlearned'
+                                kanji: valB, 
+                                kana: cellC && cellC.v !== undefined ? String(cellC.v).trim() : "",
+                                meaning: targetMeaning,
+                                exampleJp: exJp, 
+                                exampleVi: exVi, 
+                                synonym: "", 
+                                hanviet: hv, 
+                                flipCount: 0, starred: false,
+                                interval: 0, ease: 2.5, nextReview: 0,
+                                difficulty: "unlearned"
                             });
                         } else { emptyStreak++; }
                         rowIndex++;
@@ -757,11 +818,51 @@
                 });
 
                 if (Object.keys(newDb).filter(k => k !== '_amHanViet').length > 0) {
-                    db = newDb; saveToLocalStorage(); alert("📥 Data đã được nạp và đồng bộ!"); initSheetSelect();
+                    const oldDb = db;
+                    for (const sheetName in newDb) {
+                        if (sheetName === '_amHanViet') continue;
+                        if (oldDb[sheetName]) {
+                            newDb[sheetName].forEach(newWord => {
+                                const matchedOld = oldDb[sheetName].find(o => o.kanji === newWord.kanji);
+                                if (matchedOld) {
+                                    newWord.starred = matchedOld.starred !== undefined ? matchedOld.starred : false;
+                                    newWord.flipCount = matchedOld.flipCount !== undefined ? matchedOld.flipCount : 0;
+                                    newWord.difficulty = matchedOld.difficulty !== undefined ? matchedOld.difficulty : "unlearned";
+                                    newWord.interval = matchedOld.interval !== undefined ? matchedOld.interval : 0;
+                                    newWord.ease = matchedOld.ease !== undefined ? matchedOld.ease : 2.5;
+                                    newWord.nextReview = matchedOld.nextReview !== undefined ? matchedOld.nextReview : 0;
+                                }
+                            });
+                        }
+                    }
+                    db = newDb; saveToLocalStorage(); alert("📥 Data đã được nạp và cập nhật thành công (Giữ nguyên tiến độ)!"); initSheetSelect();
                 } else { alert("Lỗi định dạng dữ liệu tệp!"); }
             } catch (err) { alert("Lỗi: " + err.message); }
         };
         reader.readAsArrayBuffer(file);
+    }
+
+    function getWordDifficulty(w) {
+        if (w.difficulty) return w.difficulty;
+        if (!w.interval || w.interval === 0) return 'unlearned';
+        if (w.interval === 1) return 'again';
+        if (w.interval <= 9) return 'hard';
+        if (w.interval <= 29) return 'good';
+        return 'easy';
+    }
+
+    function updateDifficultyCounters() {
+        const full = db[currentSheetName] || [];
+        let counts = { again: 0, hard: 0, good: 0, easy: 0 };
+        full.forEach(w => {
+            const lvl = getWordDifficulty(w);
+            if (counts[lvl] !== undefined) counts[lvl]++;
+        });
+        document.getElementById('badge-all').innerText = full.length;
+        document.getElementById('badge-again').innerText = counts.again;
+        document.getElementById('badge-hard').innerText = counts.hard;
+        document.getElementById('badge-good').innerText = counts.good;
+        document.getElementById('badge-easy').innerText = counts.easy;
     }
 
     function loadSheet() {
@@ -775,63 +876,54 @@
         const searchInput = document.getElementById('vocab-search-input');
         if(searchInput) searchInput.value = '';
 
-        db[currentSheetName] = (db[currentSheetName] || []).map(w => { 
-            w.hanviet = autoTranslateHanViet(w.kanji); 
+        currentList = (db[currentSheetName] || []).map(w => { 
+            w.hanviet = w.hanviet || autoTranslateHanViet(w.kanji); 
             if (w.interval === undefined) w.interval = 0;
             if (w.ease === undefined) w.ease = 2.5;
             if (w.nextReview === undefined) w.nextReview = 0;
-            if (!w.userLevel) {
-                w.userLevel = w.interval > 0 ? (w.interval === 1 ? 'again' : (w.interval <= 3 ? 'hard' : (w.interval <= 10 ? 'good' : 'easy'))) : 'unlearned';
-            }
+            if (!w.difficulty) w.difficulty = getWordDifficulty(w);
             return w; 
         });
         
-        filterData();
+        activeWordIndex = 0; 
+        updateFlashcard(); 
+        resetTypingCounters();
+        updateDifficultyCounters();
+        if(document.getElementById('tab-manager').style.display === 'flex') { renderManagerList(); }
     }
 
-    /* HÀM LỌC DỮ LIỆU ĐA NĂNG & ĐỒNG BỘ BADGES ĐẾM SỐ TỪ THEO MỨC ĐỘ */
     function filterData() {
         const full = db[currentSheetName] || [];
         const isOnlyBookmarked = document.getElementById('only-bookmarked').checked;
-        const levelFilter = document.getElementById('level-filter').value;
-
-        let counts = { all: 0, again: 0, hard: 0, good: 0, easy: 0 };
-        full.forEach(w => {
-            counts.all++;
-            if (w.userLevel && counts[w.userLevel] !== undefined) {
-                counts[w.userLevel]++;
-            }
-        });
-
-        if(document.getElementById('badge-all')) document.getElementById('badge-all').innerText = counts.all;
-        if(document.getElementById('badge-again')) document.getElementById('badge-again').innerText = counts.again;
-        if(document.getElementById('badge-hard')) document.getElementById('badge-hard').innerText = counts.hard;
-        if(document.getElementById('badge-good')) document.getElementById('badge-good').innerText = counts.good;
-        if(document.getElementById('badge-easy')) document.getElementById('badge-easy').innerText = counts.easy;
-
-        document.querySelectorAll('.difficulty-panel .diff-btn').forEach(btn => btn.classList.remove('active-choice'));
-        if (levelFilter === 'all') document.getElementById('btn-diff-all')?.classList.add('active-choice');
-        if (levelFilter === 'again') document.getElementById('btn-diff-again')?.classList.add('active-choice');
-        if (levelFilter === 'hard') document.getElementById('btn-diff-hard')?.classList.add('active-choice');
-        if (levelFilter === 'good') document.getElementById('btn-diff-good')?.classList.add('active-choice');
-        if (levelFilter === 'easy') document.getElementById('btn-diff-easy')?.classList.add('active-choice');
-
+        const selectedLevel = document.getElementById('level-filter').value;
+        
         currentList = full.filter(w => {
-            if (isOnlyBookmarked && !w.starred) return false;
-            if (levelFilter !== 'all') {
-                if (levelFilter === 'unlearned') return !w.userLevel || w.userLevel === 'unlearned';
-                return w.userLevel === levelFilter;
-            }
-            return true;
+            const matchStarred = !isOnlyBookmarked || w.starred;
+            const matchLevel = selectedLevel === 'all' || getWordDifficulty(w) === selectedLevel;
+            return matchStarred && matchLevel;
         });
-
-        activeWordIndex = 0;
-        updateFlashcard();
+        
+        if (currentList.length === 0) {
+            alert("Không có từ vựng nào thuộc nhóm bộ lọc này!");
+            document.getElementById('only-bookmarked').checked = false;
+            document.getElementById('level-filter').value = 'all';
+            currentList = [...full];
+        }
+        
+        activeWordIndex = 0; 
+        updateFlashcard(); 
+        filterManagerList();
+        updateDifficultyCounters();
         resetTypingCounters();
-        if(document.getElementById('tab-manager').style.display === 'flex') { filterManagerList(); }
     }
 
-    function saveToLocalStorage() { localStorage.setItem('jlpt_kanji_db', JSON.stringify(db)); }
+    function saveToLocalStorage() { 
+        try {
+            localStorage.setItem('jlpt_kanji_db', JSON.stringify(db)); 
+        } catch(e) {
+            console.log("Không thể lưu localStorage.");
+        }
+    }
 
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
@@ -847,9 +939,6 @@
     }
 
     function updateFlashcard() {
-        const cardContainer = document.getElementById('flashcard-container');
-        cardContainer.className = 'flashcard'; 
-
         if(currentList.length === 0) { 
             document.getElementById('fc-front-text').innerText = "Trống"; 
             document.getElementById('progress-fill').style.width = '0%';
@@ -860,8 +949,19 @@
         const word = currentList[activeWordIndex];
         document.getElementById('fc-front-text').innerText = word.kanji;
         
-        if (word.userLevel && word.userLevel !== 'unlearned') {
-            cardContainer.classList.add('lvl-' + word.userLevel);
+        const cardContainer = document.getElementById('flashcard-container');
+        cardContainer.classList.remove('lvl-again', 'lvl-hard', 'lvl-good', 'lvl-easy');
+        const currentLvl = getWordDifficulty(word);
+        if(currentLvl !== 'unlearned') {
+            cardContainer.classList.add(`lvl-${currentLvl}`);
+        }
+
+        document.querySelectorAll('.difficulty-panel .diff-btn').forEach(btn => btn.classList.remove('active-choice'));
+        if(currentLvl !== 'unlearned') {
+            const activeBtn = document.getElementById(`btn-diff-${currentLvl}`);
+            if(activeBtn) activeBtn.classList.add('active-choice');
+        } else {
+            document.getElementById('btn-diff-all').classList.add('active-choice');
         }
         
         const views = `👁️ ${word.flipCount || 0}`;
@@ -872,6 +972,17 @@
         document.getElementById('fc-kana').innerText = word.kana ? `[ ${word.kana} ]` : '';
         document.getElementById('fc-meaning').innerText = word.meaning;
 
+        const exBox = document.getElementById('fc-example-box');
+        if (word.exampleJp || word.exampleVi) {
+            document.getElementById('fc-example-jp').innerHTML = highlightInSentence(word.exampleJp || "---", word.kanji);
+            const viEl = document.getElementById('fc-example-vi');
+            viEl.innerText = word.exampleVi || "---";
+            viEl.classList.remove('revealed'); 
+            exBox.style.display = 'block';
+        } else {
+            exBox.style.display = 'none';
+        }
+
         const sameBox = document.getElementById('fc-same-box');
         if (word.synonym) { 
             const sameEl = document.getElementById('fc-same');
@@ -879,15 +990,6 @@
             sameEl.classList.remove('revealed');
             sameBox.style.display = 'block'; 
         } else { sameBox.style.display = 'none'; }
-
-        const exBox = document.getElementById('fc-ex-box');
-        if (word.exampleJp) {
-            document.getElementById('fc-ex-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
-            const viEl = document.getElementById('fc-ex-vi');
-            viEl.innerText = word.exampleVi || 'Chưa có bản dịch';
-            viEl.classList.remove('revealed'); 
-            exBox.style.display = 'flex';
-        } else { exBox.style.display = 'none'; }
 
         const total = currentList.length;
         const currentPos = activeWordIndex + 1;
@@ -897,47 +999,27 @@
         document.getElementById('progress-fill').style.width = `${pct}%`;
         document.getElementById('progress-text').innerText = `Tiến độ: ${pct}%`;
         
-        cardContainer.classList.remove('flipped');
+        document.getElementById('flashcard-container').classList.remove('flipped');
         document.getElementById('fc-gemini').href = `https://gemini.google.com/?q=Phân tích từ vựng N1: "${word.kanji}"`;
     }
 
-    function openMaziiApp(e) {
+    async function openMaziiApp(e) {
         if(e) e.stopPropagation();
-        if (isOfflineMode) { alert("Bạn đang ở chế độ Offline 📴."); return; }
         if(currentList.length === 0) return;
         const word = currentList[activeWordIndex];
-        const keyword = encodeURIComponent(word.kanji);
-        const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
-        
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            window.open(webUrl, '_blank');
-        } else if (/Android/i.test(navigator.userAgent)) {
-            const appUrl = `mazii://search/${keyword}`;
-            const startTime = Date.now(); window.location.href = appUrl;
-            setTimeout(() => { if (Date.now() - startTime < 800) { window.location.href = webUrl; } }, 500);
-        } else { 
-            window.open(webUrl, '_blank'); 
-        }
+        const text = word.kanji;
+        try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); } } catch (err) { }
+        const keyword = encodeURIComponent(text);
+        window.open(`https://mazii.net/vi-VN/search/word/ja/${keyword}`, '_blank');
     }
 
-    function openMaziiFromPopup(e) {
+    async function openMaziiFromPopup(e) {
         if(e) e.stopPropagation();
-        if (isOfflineMode) { alert("Bạn đang ở chế độ Offline 📴."); return; }
         const kanjiText = document.getElementById('modal-kanji-text').innerText;
         if(!kanjiText || kanjiText === '-') return;
-        
+        try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(kanjiText); } } catch (err) { }
         const keyword = encodeURIComponent(kanjiText);
-        const webUrl = `https://mazii.net/vi-VN/search/word/ja/${keyword}`;
-        
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            window.open(webUrl, '_blank');
-        } else if (/Android/i.test(navigator.userAgent)) {
-            const appUrl = `mazii://search/${keyword}`;
-            const startTime = Date.now(); window.location.href = appUrl;
-            setTimeout(() => { if (Date.now() - startTime < 800) { window.location.href = webUrl; } }, 500);
-        } else { 
-            window.open(webUrl, '_blank'); 
-        }
+        window.open(`https://mazii.net/vi-VN/search/word/ja/${keyword}`, '_blank');
     }
 
     function handleDifficulty(level, event) {
@@ -949,6 +1031,19 @@
         
         if (!word.interval) word.interval = 0;
         if (!word.ease) word.ease = 2.5;
+
+        if (word.difficulty === level) {
+            word.difficulty = "unlearned";
+            word.interval = 0;
+            word.ease = 2.5;
+            word.nextReview = 0;
+            saveToLocalStorage();
+            updateDifficultyCounters();
+            updateFlashcard();
+            return; 
+        }
+
+        word.difficulty = level;
 
         if (level === 'again') {
             word.interval = 1; 
@@ -963,11 +1058,10 @@
             word.ease += 0.15;
         }
 
-        word.userLevel = level; 
         word.nextReview = now + word.interval * 60 * 1000; 
         saveToLocalStorage();
-        
-        filterData();
+        updateDifficultyCounters();
+        nextCard();
     }
 
     function flipCard() {
@@ -983,7 +1077,15 @@
     function prevCard() { if(currentList.length === 0) return; if(activeWordIndex > 0) activeWordIndex--; else activeWordIndex = currentList.length - 1; updateFlashcard(); }
     function shuffleCards() { if(currentList.length === 0) return; currentList.sort(() => Math.random() - 0.5); activeWordIndex = 0; updateFlashcard(); }
     
-    function toggleStar(e) { e.stopPropagation(); if(!currentList[activeWordIndex]) return; currentList[activeWordIndex].starred = !currentList[activeWordIndex].starred; saveToLocalStorage(); updateStarUI(); if(document.getElementById('tab-manager').style.display === 'flex') { filterManagerList(); }}
+    function toggleStar(e) { 
+        e.stopPropagation(); 
+        if(!currentList[activeWordIndex]) return; 
+        currentList[activeWordIndex].starred = !currentList[activeWordIndex].starred; 
+        saveToLocalStorage(); 
+        updateStarUI(); 
+        resetTypingCounters();
+    }
+    
     function updateStarUI() {
         const word = currentList[activeWordIndex]; if(!word) return;
         document.querySelectorAll('.star-icon').forEach(el => { 
@@ -994,7 +1096,6 @@
 
     function speakJapaneseText(e, text) { 
         if(e) e.stopPropagation(); 
-        if (isOfflineMode) { alert("Đang ở chế độ Offline 📴."); return; }
         if(!text) return;
         try { window.speechSynthesis.cancel(); } catch(err) { }
         const cleanText = text.replace(/<[^>]*>/g, ''); 
@@ -1011,11 +1112,19 @@
     }
     
     function speakCurrentWord(e) { const w = currentList[activeWordIndex]; speakJapaneseText(e, w.kana || w.kanji); }
-    function speakCurrentExample(e) { speakJapaneseText(e, currentList[activeWordIndex].exampleJp); }
+    function speakExampleJpText(e, elementId) { if(e) e.stopPropagation(); const text = document.getElementById(elementId).innerText; speakJapaneseText(e, text); }
     function revealBlur(e, el) { if(e) e.stopPropagation(); el.classList.toggle('revealed'); }
 
     let typeCurrent = null;
-    function resetTypingCounters() { typingStats = { correct: 0, wrong: 0, total: 0 }; updateTypingStatsUI(); loadNextType(); }
+    function resetTypingCounters() { 
+        typingStats = { correct: 0, wrong: 0, total: 0 }; 
+        let candidates = currentList.filter(w => /[\u4e00-\u9faf]/.test(w.kanji));
+        if (candidates.length === 0) candidates = [...currentList];
+        typingPool = [...candidates].sort(() => Math.random() - 0.5);
+        updateTypingStatsUI(); 
+        loadNextType(); 
+    }
+
     function updateTypingStatsUI() {
         document.getElementById('type-correct-count').innerText = typingStats.correct;
         document.getElementById('type-wrong-count').innerText = typingStats.wrong;
@@ -1023,15 +1132,21 @@
     }
     
     function loadNextType() { 
-        if (currentList.length === 0) {
-            document.getElementById('type-q').innerText = "Trống"; document.getElementById('type-hint').innerText = "-"; return;
+        if (typingPool.length === 0) {
+            document.getElementById('type-q').innerText = "Hoàn thành!"; 
+            document.getElementById('type-hint').innerText = "Đã gõ hết toàn bộ từ vựng!";
+            document.getElementById('type-hint').classList.add('revealed');
+            const i = document.getElementById('type-input');
+            i.value = ''; i.disabled = true;
+            document.getElementById('type-feedback').innerText = 'Đang mở popup lịch sử gõ...';
+            // Tự động hiện popup thông báo lịch sử gõ khi hoàn thành
+            openTypingHistory();
+            return;
         }
-        let kanjiOnlyList = currentList.filter(w => /[\u4e00-\u9faf]/.test(w.kanji));
-        if (kanjiOnlyList.length === 0) kanjiOnlyList = currentList;
-        
-        typeCurrent = kanjiOnlyList[Math.floor(Math.random() * kanjiOnlyList.length)]; 
+        typeCurrent = typingPool.pop(); 
         document.getElementById('type-q').innerText = typeCurrent.kanji; 
         document.getElementById('type-hint').innerText = typeCurrent.meaning;
+        document.getElementById('type-hint').classList.remove('revealed');
         const i = document.getElementById('type-input'); i.value = ''; i.disabled = false; 
         document.getElementById('type-feedback').innerText = ''; i.focus(); 
     }
@@ -1045,18 +1160,19 @@
             e.preventDefault(); 
             i.disabled = true; 
             typingStats.total += 1;
+            document.getElementById('type-hint').classList.add('revealed');
 
             if (v === typeCurrent.kana.toLowerCase()) { 
                 typingStats.correct += 1; updateTypingStatsUI();
-                document.getElementById('type-feedback').style.color = 'var(--success)'; 
+                document.getElementById('type-feedback').style.color = 'var(--text-color)'; 
                 document.getElementById('type-feedback').innerText = 'Chính xác! 🎉'; 
-                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: i.value.trim(), status: 'Đúng', color: 'var(--success)' });
+                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: i.value.trim(), status: 'Đúng', color: 'var(--text-color)' });
                 setTimeout(loadNextType, 800); 
             } else { 
                 typingStats.wrong += 1; updateTypingStatsUI();
-                document.getElementById('type-feedback').style.color = 'var(--error)'; 
+                document.getElementById('type-feedback').style.color = 'var(--text-color)'; 
                 document.getElementById('type-feedback').innerText = `Sai rồi! Đáp án: ${typeCurrent.kana}`; 
-                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: i.value.trim(), status: 'Sai', color: 'var(--error)' });
+                typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: i.value.trim(), status: 'Sai', color: 'var(--text-color)' });
                 setTimeout(loadNextType, 1800); 
             } 
         } 
@@ -1067,9 +1183,40 @@
         typingStats.total += 1; typingStats.wrong += 1; updateTypingStatsUI();
         document.getElementById('type-feedback').style.color = 'var(--text-muted)';
         document.getElementById('type-feedback').innerText = `Đáp án đúng: ${typeCurrent.kana}`;
+        document.getElementById('type-hint').classList.add('revealed');
         document.getElementById('type-input').disabled = true;
-        typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: '(Bỏ qua)', status: 'Qua', color: 'var(--warning)' });
+        typeHistoryList.unshift({ word: typeCurrent.kanji, kana: typeCurrent.kana, input: '(Bỏ qua)', status: 'Qua', color: 'var(--text-muted)' });
         setTimeout(loadNextType, 1200);
+    }
+
+    function openTypingHistory() {
+        const tbody = document.getElementById('type-history-tbody');
+        tbody.innerHTML = '';
+        if (typeHistoryList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Chưa có lịch sử gõ từ.</td></tr>`;
+        } else {
+            typeHistoryList.forEach(h => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); font-weight:bold;">${h.word}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${renderDiff(h.input, h.kana)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); color:${h.status === 'Đúng' ? 'var(--success)' : 'var(--error)'}; font-weight:bold;">${h.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        document.getElementById('typing-history-modal').style.display = 'flex';
+    }
+
+    function closeTypingHistory() {
+        document.getElementById('typing-history-modal').style.display = 'none';
+    }
+
+    function clearTypingHistory() {
+        typeHistoryList = [];
+        // Tự động reset bộ đếm khi làm mới
+        resetTypingCounters();
+        openTypingHistory();
     }
 
     function renderDiff(input, correct) {
@@ -1078,7 +1225,7 @@
         for (let i = 0; i < maxLen; i++) {
             let cIn = input[i] || '', cCorr = correct[i] || '';
             if (cIn.toLowerCase() === cCorr.toLowerCase()) { html += `<span>${cIn}</span>`; } 
-            else if (cIn) { html += `<span style="background-color: rgba(231, 111, 81, 0.25); color: var(--error); font-weight: bold; border-radius: 2px; padding: 0 1px; text-decoration: line-through;">${cIn}</span>`; }
+            else if (cIn) { html += `<span style="background-color: rgba(0,0,0,0.2); color: var(--text-color); font-weight: bold; text-decoration: line-through;">${cIn}</span>`; }
         }
         return html;
     }
@@ -1089,145 +1236,84 @@
         for (let i = 0; i < maxLen; i++) {
             let cIn = input[i] || '', cCorr = correct[i] || '';
             if (cIn.toLowerCase() === cCorr.toLowerCase()) { html += `<span>${cCorr}</span>`; } 
-            else if (cCorr) { html += `<span style="background-color: rgba(116, 198, 157, 0.3); color: var(--success); font-weight: bold; border-radius: 2px; padding: 0 1px;">${cCorr}</span>`; }
+            else if (cCorr) { html += `<span style="border-bottom: 2px solid var(--text-color); font-weight: bold;">${cCorr}</span>`; }
         }
         return html;
     }
 
-    function openTypingHistory() {
-        const tbody = document.getElementById('type-history-tbody'); tbody.innerHTML = '';
-        if (typeHistoryList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Chưa có dữ liệu gõ trong phiên này</td></tr>';
-        } else {
-            typeHistoryList.forEach(item => {
-                const displayInput = item.status === 'Sai' ? renderDiff(item.input, item.kana) : item.input;
-                const displayCorrectReading = item.status === 'Sai' ? renderCorrectDiff(item.input, item.kana) : item.kana;
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                            <strong>${item.word}</strong><br><small style="color:var(--text-muted)">${displayCorrectReading}</small>
-                        </td>
-                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${displayInput}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); color: ${item.color}; font-weight: bold;">${item.status}</td>
-                    </tr>`;
-            });
-        }
-        document.getElementById('typing-history-modal').style.display = 'flex';
-    }
-
-    function closeTypingHistory() { document.getElementById('typing-history-modal').style.display = 'none'; }
-    function clearTypingHistory() { typeHistoryList = []; openTypingHistory(); }
-
     function renderManagerList() {
-        const keyword = document.getElementById('vocab-search-input').value.trim();
-        if (keyword) {
-            document.getElementById('manager-title').innerText = `Kết quả tìm kiếm cho: "${keyword}"`;
-        } else {
-            document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`;
-        }
-        filterManagerList(); 
+        document.getElementById('manager-title').innerText = `Bài học: ${currentSheetName}`; filterManagerList(); 
     }
 
     function filterManagerList() {
         const keyword = document.getElementById('vocab-search-input').value.trim().toLowerCase();
         const tbody = document.getElementById('vocab-list-tbody'); tbody.innerHTML = '';
         const isOnlyBookmarked = document.getElementById('only-bookmarked').checked;
-        const levelFilter = document.getElementById('level-filter').value;
+        const selectedLevel = document.getElementById('level-filter').value;
         
-        let searchPool = [];
-        
-        if (keyword) {
-            for (const sheetName in db) {
-                if (sheetName === '_amHanViet') continue;
-                db[sheetName].forEach((w, index) => {
-                    searchPool.push({ ...w, originSheet: sheetName, lineIndex: index + 2 });
-                });
-            }
-        } else {
-            const fullList = db[currentSheetName] || [];
-            fullList.forEach((w, index) => {
-                searchPool.push({ ...w, originSheet: currentSheetName, lineIndex: index + 2 });
+        for (const sheetName in db) {
+            if (sheetName === '_amHanViet') continue;
+            if (!keyword && sheetName !== currentSheetName) continue;
+            
+            const sheetWordsList = db[sheetName] || [];
+            
+            sheetWordsList.forEach((w, index) => {
+                const isStarredMatch = !isOnlyBookmarked || w.starred;
+                if (!isStarredMatch) return;
+                
+                const matchLevel = selectedLevel === 'all' || getWordDifficulty(w) === selectedLevel;
+                if (!matchLevel) return;
+                
+                const kj = (w.kanji || '').toLowerCase(); 
+                const hv = (w.hanviet || autoTranslateHanViet(w.kanji)).toLowerCase();
+                const mn = (w.meaning || '').toLowerCase(); 
+                const kn = (w.kana || '').toLowerCase();
+                
+                if (keyword && !kj.includes(keyword) && !hv.includes(keyword) && !mn.includes(keyword) && !kn.includes(keyword)) return; 
+
+                let tr = document.createElement('tr');
+                
+                tr.onclick = () => {
+                    if (currentSheetName !== sheetName) {
+                        document.getElementById('lesson-select').value = sheetName;
+                        currentSheetName = sheetName;
+                        const full = db[currentSheetName] || [];
+                        currentList = [...full];
+                    }
+                    showKanjiPopup(index);
+                };
+                
+                const positionAnnotation = keyword ? `<div style="text-align:center;">${index + 2}<br><small style="color:var(--text-muted);font-size:9px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55px;">${sheetName}</small></div>` : `${index + 2}`;
+
+                const actualHv = w.hanviet || autoTranslateHanViet(w.kanji);
+                const displayKanji = highlightSearchKeyword(w.kanji, keyword);
+                const displayHanviet = highlightSearchKeyword(actualHv, keyword);
+                const displayKana = highlightSearchKeyword(w.kana, keyword);
+                const displayMeaning = highlightSearchKeyword(w.meaning, keyword);
+
+                tr.innerHTML = `
+                    <td>${positionAnnotation}</td>
+                    <td onclick="event.stopPropagation(); toggleStarFromList('${sheetName}', ${index})">${w.starred ? '⭐' : '☆'}</td>
+                    <td>${w.flipCount || 0}</td>
+                    <td style="font-weight: bold; color: var(--text-color); text-decoration: underline dotted;">${displayKanji}</td>
+                    <td style="color: var(--primary); font-weight: bold; text-transform: uppercase;">${displayHanviet}</td>
+                    <td>${displayKana}</td>
+                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${displayMeaning}</td>`;
+                tbody.appendChild(tr);
             });
-        }
-
-        if (isOnlyBookmarked) {
-            searchPool = searchPool.filter(w => w.starred);
-        }
-        if (levelFilter !== 'all') {
-            searchPool = searchPool.filter(w => {
-                if (levelFilter === 'unlearned') return !w.userLevel || w.userLevel === 'unlearned';
-                return w.userLevel === levelFilter;
-            });
-        }
-
-        let hasResults = false;
-
-        searchPool.forEach((w) => {
-            const originHv = w.hanviet || autoTranslateHanViet(w.kanji);
-            
-            const kj = (w.kanji || '').toLowerCase(); 
-            const hv = originHv.toLowerCase();
-            const mn = (w.meaning || '').toLowerCase(); 
-            const kn = (w.kana || '').toLowerCase();
-            
-            if (keyword && !kj.includes(keyword) && !hv.includes(keyword) && !mn.includes(keyword) && !kn.includes(keyword)) return; 
-
-            hasResults = true;
-            let tr = document.createElement('tr');
-            
-            tr.onclick = () => {
-                const sheetData = db[w.originSheet] || [];
-                const actualIdx = sheetData.findIndex(orig => orig.kanji === w.kanji);
-                if (actualIdx !== -1) {
-                    const oldSheet = currentSheetName;
-                    currentSheetName = w.originSheet;
-                    showKanjiPopup(actualIdx);
-                    currentSheetName = oldSheet;
-                }
-            };
-
-            let sttContent = '';
-            if (keyword) {
-                sttContent = `
-                    <span style="display:block; font-size:10px; font-weight:normal; color:#4a90e2;">${w.originSheet}</span>
-                    <span style="display:block; font-weight:600; font-size:12px;">Dòng ${w.lineIndex}</span>
-                `;
-            } else {
-                sttContent = `<span style="font-weight:600; font-size:13px; color:var(--text-color);">${w.lineIndex}</span>`;
-            }
-
-            const displayKanji = keyword ? highlightSearchText(w.kanji, keyword) : w.kanji;
-            const displayHanViet = keyword ? highlightSearchText(originHv, keyword) : originHv;
-            const displayKana = keyword ? highlightSearchText(w.kana || '---', keyword) : (w.kana || '---');
-            const displayMeaning = keyword ? highlightSearchText(w.meaning, keyword) : w.meaning;
-
-            tr.innerHTML = `
-                <td style="text-align: center; color: var(--text-muted); line-height: 1.3; padding: 10px 6px;">${sttContent}</td>
-                <td onclick="event.stopPropagation(); toggleStarFromGlobalList('${w.originSheet}', '${w.kanji}')">${w.starred ? '⭐' : '☆'}</td>
-                <td>${w.flipCount || 0}</td>
-                <td style="font-weight: bold; color: var(--primary); text-decoration: underline dotted;">${displayKanji}</td>
-                <td style="color: var(--accent); font-weight: bold; text-transform: uppercase;">${displayHanViet}</td>
-                <td>${displayKana}</td>
-                <td>${displayMeaning}</td>`;
-            tbody.appendChild(tr);
-        });
-
-        if (!hasResults) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 30px; color: var(--text-muted);">Không tìm thấy từ vựng tương ứng</td></tr>`;
         }
     }
 
-    function toggleStarFromGlobalList(sheetName, kanjiKey) {
+    function toggleStarFromList(sheetName, index) {
         const listData = db[sheetName] || [];
-        const idx = listData.findIndex(w => w.kanji === kanjiKey);
-        if (idx !== -1) {
-            listData[idx].starred = !listData[idx].starred;
+        if (listData[index]) {
+            listData[index].starred = !listData[index].starred; 
             saveToLocalStorage();
-            
             if (sheetName === currentSheetName) {
-                updateStarUI();
+                filterData();
+            } else {
+                filterManagerList();
             }
-            filterData();
         }
     }
 
@@ -1237,77 +1323,197 @@
         document.getElementById('modal-hanviet-text').innerText = word.hanviet || autoTranslateHanViet(word.kanji);
         document.getElementById('modal-kana-text').innerText = word.kana ? `[ ${word.kana} ]` : '';
         document.getElementById('modal-meaning-text').innerText = word.meaning;
-        const modalViEl = document.getElementById('modal-example-vi'); modalViEl.classList.remove('revealed'); 
-
-        if (word.exampleJp) {
-            document.getElementById('modal-example-jp').innerHTML = highlightKeyword(word.exampleJp, word.kanji);
-            modalViEl.innerText = word.exampleVi || 'Chưa có bản dịch'; modalViEl.style.display = 'inline-block';
+        
+        const modalExBox = document.getElementById('modal-example-box');
+        if (word.exampleJp || word.exampleVi) {
+            document.getElementById('modal-example-jp').innerHTML = highlightInSentence(word.exampleJp || "---", word.kanji);
+            const viModalEl = document.getElementById('modal-example-vi');
+            viModalEl.innerText = word.exampleVi || "---";
+            viModalEl.classList.remove('revealed'); 
+            modalExBox.style.display = 'block';
         } else {
-            document.getElementById('modal-example-jp').innerText = 'Chưa cập nhật ví dụ.'; modalViEl.innerText = ''; modalViEl.style.display = 'none';
+            modalExBox.style.display = 'none';
         }
+
         document.getElementById('kanji-popup').style.display = 'flex';
     }
 
     function closeKanjiPopup() { document.getElementById('kanji-popup').style.display = 'none'; }
+</script>
+<script>
+    let syncPeer = null;
+    let syncConn = null;
 
-    function getComputedVariable(varName) {
-        return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-    }
+    document.getElementById('sync-fab').addEventListener('click', openSyncModal);
 
-    function rgbOrHexToHex(colorStr) {
-        if (!colorStr) return '#ffffff';
-        if (colorStr.startsWith('#')) {
-            if (colorStr.length === 4) {
-                return '#' + colorStr[1] + colorStr[1] + colorStr[2] + colorStr[2] + colorStr[3] + colorStr[3];
-            }
-            return colorStr;
+    function openSyncModal() {
+        document.getElementById('sync-modal').style.display = 'flex';
+        if (!syncPeer) {
+            initSyncPeer();
         }
-        return colorStr;
     }
 
-    function openColorModal() {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-        document.getElementById('color-modal-subtitle').innerText = `Đang sửa cấu hình giao diện: ${currentTheme === 'light' ? 'SÁNG (Light)' : 'TỐI (Dark)'}`;
+    function closeSyncModal() {
+        document.getElementById('sync-modal').style.display = 'none';
+    }
+
+    function initSyncPeer() {
+        const statusText = document.getElementById('sync-status-text');
+        statusText.innerText = "Đang cấp mã định danh ngắn...";
+        const shortId = Math.floor(100000 + Math.random() * 900000).toString();
+        syncPeer = new Peer(shortId);
         
-        document.getElementById('cp-bg-color').value = rgbOrHexToHex(getComputedVariable('--bg-color'));
-        document.getElementById('cp-card-bg').value = rgbOrHexToHex(getComputedVariable('--card-bg'));
-        document.getElementById('cp-primary').value = rgbOrHexToHex(getComputedVariable('--primary'));
-        document.getElementById('cp-secondary').value = rgbOrHexToHex(getComputedVariable('--secondary'));
-        document.getElementById('cp-accent').value = rgbOrHexToHex(getComputedVariable('--accent'));
-        document.getElementById('cp-text-color').value = rgbOrHexToHex(getComputedVariable('--text-color'));
-
-        document.getElementById('color-custom-modal').style.display = 'flex';
+        syncPeer.on('open', function(id) {
+            document.getElementById('sync-my-id').innerText = id;
+            statusText.innerText = "Sẵn sàng liên kết mạng chéo!";
+            
+            const qrContainer = document.getElementById('sync-qrcode-container');
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: id,
+                width: 110,
+                height: 110,
+                colorDark : "#000000",
+                colorLight : "#ffffff"
+            });
+        });
+        
+        syncPeer.on('connection', function(conn) {
+            syncConn = conn;
+            setupConnectionListeners(false);
+        });
+        
+        syncPeer.on('error', function(err) {
+            if (err.type === 'unavailable-id') {
+                console.log("Mã số trùng lặp trên hệ thống tín hiệu, đang tạo mã mới...");
+                initSyncPeer();
+            } else {
+                statusText.innerText = "Lỗi kết nối: " + err.type;
+                console.error(err);
+            }
+        });
     }
 
-    function closeColorModal() { document.getElementById('color-custom-modal').style.display = 'none'; }
-    function applyLiveColor(varName, val) { document.documentElement.style.setProperty(varName, val); }
-
-    function saveCustomColors() {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-        const colorConfig = {
-            '--bg-color': document.getElementById('cp-bg-color').value,
-            '--card-bg': document.getElementById('cp-card-bg').value,
-            '--primary': document.getElementById('cp-primary').value,
-            '--secondary': document.getElementById('cp-secondary').value,
-            '--accent': document.getElementById('cp-accent').value,
-            '--text-color': document.getElementById('cp-text-color').value
-        };
-
-        localStorage.setItem(`custom_colors_${currentTheme}`, JSON.stringify(colorConfig));
-        alert(`🎉 Đã lưu cấu hình bảng màu tùy chỉnh cho chế độ ${currentTheme === 'light' ? 'Sáng' : 'Tối'}!`);
-        closeColorModal();
+    function connectToPeer() {
+        const remoteId = document.getElementById('sync-remote-id').value.trim();
+        const statusText = document.getElementById('sync-status-text');
+        if (!remoteId || remoteId.length < 4) {
+            alert("Vui lòng nhập đúng mã số kết nối (4 đến 6 chữ số)!");
+            return;
+        }
+        statusText.innerText = "Đang bắt tay kết nối toàn cầu P2P...";
+        syncConn = syncPeer.connect(remoteId);
+        setupConnectionListeners(true);
     }
 
-    function resetToDefaultColors() {
-        if (confirm("Bạn có chắc chắn muốn xóa tùy chỉnh và khôi phục về bảng màu mặc định gốc không?")) {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-            localStorage.removeItem(`custom_colors_${currentTheme}`);
+    function setupConnectionListeners(isInitiator) {
+        const statusText = document.getElementById('sync-status-text');
+        
+        syncConn.on('open', function() {
+            statusText.innerText = "Liên kết thành công! Đang trao đổi gói dữ liệu...";
+            if (isInitiator) {
+                const localData = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    localData[k] = localStorage.getItem(k);
+                }
+                syncConn.send({ type: 'SYNC_REQUEST', payload: localData });
+            }
+        });
+        
+        syncConn.on('data', function(data) {
+            if (!data) return;
             
-            const targets = ['--bg-color', '--card-bg', '--primary', '--secondary', '--accent', '--text-color'];
-            targets.forEach(t => document.documentElement.style.removeProperty(t));
+            if (data.type === 'SYNC_REQUEST') {
+                statusText.innerText = "Đang xử lý hợp nhất tiến trình...";
+                const localDataBeforeMerge = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    localDataBeforeMerge[k] = localStorage.getItem(k);
+                }
+                executeSmartMerge(data.payload);
+                syncConn.send({ type: 'SYNC_RESPONSE', payload: localDataBeforeMerge });
+                statusText.innerText = "Đồng bộ thành công! Đang làm mới ứng dụng...";
+                setTimeout(() => { window.location.reload(); }, 1200);
+            }
             
-            closeColorModal();
-            alert("Đã khôi phục cài đặt màu sắc chuẩn ban đầu thành công!");
+            if (data.type === 'SYNC_RESPONSE') {
+                statusText.innerText = "Đang thực thi cấu trúc phản hồi...";
+                executeSmartMerge(data.payload);
+                statusText.innerText = "Đồng bộ thành công! Đang làm mới ứng dụng...";
+                setTimeout(() => { window.location.reload(); }, 1200);
+            }
+        });
+        
+        syncConn.on('close', function() {
+            statusText.innerText = "Đường truyền tín hiệu đã ngắt.";
+        });
+    }
+
+    function executeSmartMerge(incomingStorage) {
+        try {
+            if (!incomingStorage) return;
+            
+            if (incomingStorage['app_theme'] && !localStorage.getItem('app_theme')) {
+                localStorage.setItem('app_theme', incomingStorage['app_theme']);
+            }
+            
+            let incomingDbRaw = incomingStorage['jlpt_kanji_db'];
+            if (!incomingDbRaw) return;
+            
+            let incomingDb = JSON.parse(incomingDbRaw);
+            let currentDb = JSON.parse(localStorage.getItem('jlpt_kanji_db')) || {};
+            
+            for (const sheet in incomingDb) {
+                if (sheet === '_amHanViol') continue;
+                if (sheet === '_amHanViet') {
+                    if (!currentDb['_amHanViet']) currentDb['_amHanViet'] = {};
+                    Object.assign(currentDb['_amHanViet'], incomingDb['_amHanViet']);
+                    continue;
+                }
+                
+                if (!currentDb[sheet]) {
+                    currentDb[sheet] = incomingDb[sheet];
+                    continue;
+                }
+                
+                const localArr = currentDb[sheet];
+                const remoteArr = incomingDb[sheet];
+                
+                remoteArr.forEach(remoteWord => {
+                    const localWord = localArr.find(w => w.kanji === remoteWord.kanji);
+                    if (localWord) {
+                        if ((remoteWord.flipCount || 0) > (localWord.flipCount || 0)) {
+                            localWord.flipCount = remoteWord.flipCount;
+                        }
+                        if (remoteWord.starred) {
+                            localWord.starred = true;
+                        }
+                        if (remoteWord.exampleJp && !localWord.exampleJp) localWord.exampleJp = remoteWord.exampleJp;
+                        if (remoteWord.exampleVi && !localWord.exampleVi) localWord.exampleVi = remoteWord.exampleVi;
+
+                        if (remoteWord.difficulty && !localWord.difficulty) {
+                            localWord.difficulty = remoteWord.difficulty;
+                            localWord.interval = remoteWord.interval;
+                            localWord.ease = remoteWord.ease;
+                            localWord.nextReview = remoteWord.nextReview;
+                        } else if (remoteWord.difficulty && localWord.difficulty) {
+                            if ((remoteWord.nextReview || 0) > (localWord.nextReview || 0)) {
+                                localWord.difficulty = remoteWord.difficulty;
+                                localWord.interval = remoteWord.interval;
+                                localWord.ease = remoteWord.ease;
+                                localWord.nextReview = remoteWord.nextReview;
+                            }
+                        }
+                    } else {
+                        localArr.push(remoteWord);
+                    }
+                });
+            }
+            
+            localStorage.setItem('jlpt_kanji_db', JSON.stringify(currentDb));
+        } catch (err) {
+            console.error("Lỗi đồng bộ trộn dữ liệu hệ thống:", err);
         }
     }
 </script>
